@@ -8,6 +8,9 @@ public class MyTree : MonoBehaviour
 {
 
     public Material trunkMaterial;
+    public Material leafMaterial;
+
+
 
 
     public float treeHeight = 10f;
@@ -67,6 +70,8 @@ public class MyTree : MonoBehaviour
 
         // Generate the main branches
         GenerateMainBranches();
+
+        GenerateBranchObjects();
 
     }
 
@@ -169,6 +174,54 @@ public class MyTree : MonoBehaviour
     }
 
 
+    public void GenerateBranchObjects()
+    {
+        // Remove previous branch GameObjects
+        foreach (Transform child in transform)
+        {
+            if (child.name == "Branch" || child.name == "Leaf")
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        // Generate branch GameObjects and Meshes
+        foreach (TreeBranch branch in mainBranches)
+        {
+            Mesh branchMesh = TreeMeshGenerator.CreateBranchMesh(branch, 0.1f, 8); // Adjust the branch radius as needed
+            GameObject branchObject = new GameObject("Branch");
+            branchObject.transform.SetParent(transform);
+            branchObject.transform.position = Vector3.zero;
+            branchObject.transform.rotation = Quaternion.identity;
+            MeshFilter branchMeshFilter = branchObject.AddComponent<MeshFilter>();
+            branchMeshFilter.mesh = branchMesh;
+            MeshRenderer branchRenderer = branchObject.AddComponent<MeshRenderer>();
+            branchRenderer.material = trunkMaterial; // Assign the same material as the trunk, or create a new one if needed
+        }
+
+
+        GenerateLeafObjects();
+        
+    }
+
+    public void GenerateLeafObjects(){
+
+        foreach (Vector3 leafPosition in allLeafPositions)
+        {
+            Mesh leafMesh = LeafMeshGenerator.CreateLeafMesh(new Vector2(0.5f, 0.5f)); // Adjust the leaf size as needed
+            GameObject leafObject = new GameObject("Leaf");
+            leafObject.transform.SetParent(transform);
+            leafObject.transform.position = leafPosition;
+            leafObject.transform.rotation = Quaternion.Euler(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360)); // Apply random rotation
+            MeshFilter leafMeshFilter = leafObject.AddComponent<MeshFilter>();
+            leafMeshFilter.mesh = leafMesh;
+            MeshRenderer leafRenderer = leafObject.AddComponent<MeshRenderer>();
+            leafRenderer.material = leafMaterial;
+}
+    }
+
+
+
     void Update()
     {
 
@@ -183,7 +236,16 @@ public class MyTree : MonoBehaviour
         Mesh trunkMesh = TreeMeshGenerator.CreateTrunkMesh(vertices, 0.2f, 8);
         MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
         meshFilter.mesh = trunkMesh;
+
+        if (Application.isPlaying)
+        {
+            GenerateBranchObjects();
+        }
+
     }
+
+
+
 
     void OnDrawGizmos()
     {
