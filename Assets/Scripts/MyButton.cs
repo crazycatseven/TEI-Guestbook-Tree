@@ -12,6 +12,13 @@ public class MyButton : MonoBehaviour
     public Text textZone2;
     public Slider slider;
 
+    private MyTree treeScript;
+
+
+
+    private float sliderValue = 0.0f;
+    private bool sliderValueChanged = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,11 +36,22 @@ public class MyButton : MonoBehaviour
 
         UduinoManager.Instance.OnDataReceived += DataReceived;
 
+        GameObject treeObject = GameObject.Find("Tree");
+        treeScript = treeObject.GetComponent<MyTree>();
+
+
+        int analogValueA0 = UduinoManager.Instance.analogRead(AnalogPin.A0);
+        sliderValue = (float) analogValueA0 / 1023.0f;
+
+
+
+
+
     }
 
     void DataReceived(string data, UduinoDevice device)
     {
-        Debug.Log("Data received from " + device.name + " : " + data);
+        Debug.Log("Data received: " + data);
     }
 
     // Update is called once per frame
@@ -47,11 +65,19 @@ public class MyButton : MonoBehaviour
         textZone2.text = "A2: " + analogValueA2.ToString(); // 0 - 1023
 
 
+        int newSliderValue = (int) (analogValueA0 / 1023.0f * 100.0f);
+        if (newSliderValue != sliderValue)
+        {
+            sliderValue = newSliderValue;
+            sliderValueChanged = true;
+        }
 
-
-        // 0 - 1023
-        slider.value = (float) analogValueA0 / 1023.0f;
-
+        if (sliderValueChanged)
+        {
+            sliderValueChanged = false;
+            treeScript.growingFactor = sliderValue / 100.0f;
+            treeScript.GenerateTree();
+        }
 
 
         int buttonState5 = UduinoManager.Instance.digitalRead(5);
