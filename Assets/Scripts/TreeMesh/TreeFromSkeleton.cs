@@ -5,7 +5,7 @@ using UnityEngine;
 public class TreeFromSkeleton : MonoBehaviour
 {
     [Range(0, 1)]
-    public float growthFactor = 1.0f;
+    public float growthFactor = 0.0f;
 
     [SerializeField]
     private int radialSegments = 8;
@@ -93,7 +93,8 @@ public class TreeFromSkeleton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Grow();
+        UpdateTrunk();
+        UpdateBranches();
         Mesh updatedTrunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, actualVertexCount);
         Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
 
@@ -105,7 +106,7 @@ public class TreeFromSkeleton : MonoBehaviour
 
     }
 
-    private void Grow()
+    private void UpdateTrunk()
     {
         TreeVertex lastVertex = null;
         TreeVertex nextVertex = null;
@@ -173,20 +174,21 @@ public class TreeFromSkeleton : MonoBehaviour
     }
 
 
-    private void parseB()
+    private void UpdateBranches()
     {
-        string path = "Assets/Scripts/TreeMesh/Tree-mesh.txt";
-        List<Branch> branches = BranchParser.ParseBranches(path, 1);
-
-
-        Debug.Log("branches.Count: " + branches.Count);
-
-        foreach (Branch branch in branches)
+        for (int i = 0; i < branches.Count; i++)
         {
-            Debug.Log("branch: " + branch);
-        }
+            Branch branch = branches[i];
 
+            // 寻找当前树枝的起始顶点的索引
+            int startIndex = branch.Vertices[0].Index;
+
+            
+
+            
+        }
     }
+
 
 
     // 合并两个 Mesh 对象的方法
