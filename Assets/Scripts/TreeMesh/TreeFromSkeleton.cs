@@ -17,6 +17,8 @@ public class TreeFromSkeleton : MonoBehaviour
 
     private List<TreeVertex> trunkVertices;
 
+    private List<Branch> branches;
+
     private float trunkTotalLength;
 
     private float[] trunkVerticesLengthRatios;
@@ -32,9 +34,9 @@ public class TreeFromSkeleton : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
-        // 1. 解析树干顶点
+        // 1. 解析树干和树枝的顶点
         trunkVertices = TrunkParser.ParseTrunkVertices(trunkFilePath);
+        branches = BranchParser.ParseBranches(trunkFilePath, 1);
         
         // 1.1 在树干顶点组最后添加一个顶点，作为预留的插值顶点
         TreeVertex emptyVertex = new TreeVertex(-1, Vector3.zero, Vector3.zero, 0, 0);
@@ -62,6 +64,10 @@ public class TreeFromSkeleton : MonoBehaviour
         
         // 2. 使用解析出的顶点创建树干网格
         Mesh trunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, trunkVertices.Count - 1);
+        Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
+
+        Mesh combinedMesh = CombineMeshes(trunkMesh, branchesMesh);
+
 
         // 3. 将生成的树干网格赋给 MeshFilter 组件
         meshFilter = GetComponent<MeshFilter>();
@@ -70,7 +76,7 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             meshFilter = gameObject.AddComponent<MeshFilter>();
         }
-        meshFilter.mesh = trunkMesh;
+        meshFilter.mesh = combinedMesh;
 
         // 4. 为树干添加 MeshRenderer
         meshRenderer = GetComponent<MeshRenderer>();
@@ -79,6 +85,9 @@ public class TreeFromSkeleton : MonoBehaviour
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
 
+
+
+
     }
 
     // Update is called once per frame
@@ -86,7 +95,14 @@ public class TreeFromSkeleton : MonoBehaviour
     {
         Grow();
         Mesh updatedTrunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, actualVertexCount);
-        meshFilter.mesh = updatedTrunkMesh;
+        Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
+
+
+        Mesh combinedMesh = CombineMeshes(updatedTrunkMesh, branchesMesh);
+        meshFilter.mesh = combinedMesh;
+
+
+
     }
 
     private void Grow()
@@ -154,6 +170,41 @@ public class TreeFromSkeleton : MonoBehaviour
 
 
         // Debug.Log("lastVertex: " + lastVertex.Position + ", nextVertex: " + nextVertex.Position + ", interpolatedPosition: " + interpolatedPosition);
+    }
+
+
+    private void parseB()
+    {
+        string path = "Assets/Scripts/TreeMesh/Tree-mesh.txt";
+        List<Branch> branches = BranchParser.ParseBranches(path, 1);
+
+
+        Debug.Log("branches.Count: " + branches.Count);
+
+        foreach (Branch branch in branches)
+        {
+            Debug.Log("branch: " + branch);
+        }
+
+    }
+
+
+    // 合并两个 Mesh 对象的方法
+    private Mesh CombineMeshes(Mesh mesh1, Mesh mesh2)
+    {
+        Mesh combinedMesh = new Mesh();
+
+        // Combine meshes
+        CombineInstance[] combineInstances = new CombineInstance[2];
+        combineInstances[0].mesh = mesh1;
+        combineInstances[0].transform = Matrix4x4.identity;
+        combineInstances[1].mesh = mesh2;
+        combineInstances[1].transform = Matrix4x4.identity;
+
+        combinedMesh.CombineMeshes(combineInstances);
+        combinedMesh.RecalculateNormals();
+
+        return combinedMesh;
     }
 
 

@@ -57,37 +57,6 @@ public class MeshGenerator
 
         // Step 3: Create triangles based on the vertex array and store them in a triangle array
         int[] triangles = new int[(actualTrunkVertexCount + (interpolation ? 0 : -1)) * radialSegments * 6];
-        // for (int i = 0; i < actualTrunkVertexCount - 1; i++)
-        // {
-        //     for (int j = 0; j < radialSegments; j++)
-        //     {
-        //         int baseIndex = i * (radialSegments + 1) + j;
-        //         int triangleIndex = (i * radialSegments + j) * 6;
-
-        //         triangles[triangleIndex] = baseIndex;
-        //         triangles[triangleIndex + 1] = baseIndex + radialSegments + 1;
-        //         triangles[triangleIndex + 2] = baseIndex + 1;
-        //         triangles[triangleIndex + 3] = baseIndex + 1;
-        //         triangles[triangleIndex + 4] = baseIndex + radialSegments + 1;
-        //         triangles[triangleIndex + 5] = baseIndex + radialSegments + 2;
-        //     }
-
-        //     if (interpolation && i == actualTrunkVertexCount - 2)
-        //     {
-        //         for (int j = 0; j < radialSegments; j++)
-        //         {
-        //             int baseIndex = (i+1) * (radialSegments + 1) + j;
-        //             int triangleIndex = ((i+1) * radialSegments + j) * 6;
-
-        //             triangles[triangleIndex] = baseIndex;
-        //             triangles[triangleIndex + 1] = baseIndex + radialSegments + 1;
-        //             triangles[triangleIndex + 2] = baseIndex + 1;
-        //             triangles[triangleIndex + 3] = baseIndex + 1;
-        //             triangles[triangleIndex + 4] = baseIndex + radialSegments + 1;
-        //             triangles[triangleIndex + 5] = baseIndex + radialSegments + 2;
-        //         }
-        //     }
-        // }
 
         if (actualTrunkVertexCount == 1 && interpolation)
         {
@@ -152,5 +121,25 @@ public class MeshGenerator
         return trunkMesh;
         //
     }
+
+    public static Mesh CreateBranchesMesh(List<Branch> branches, int radialSegments)
+    {
+        Mesh combinedMesh = new Mesh();
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
+
+        foreach (Branch branch in branches)
+        {
+            List<TreeVertex> branchVerticesList = branch.Vertices;
+            Mesh branchMesh = MeshGenerator.CreateTrunkMesh(branchVerticesList, radialSegments, branchVerticesList.Count);
+            CombineInstance combineInstance = new CombineInstance { mesh = branchMesh, transform = Matrix4x4.identity };
+            combineInstances.Add(combineInstance);
+        }
+
+        combinedMesh.CombineMeshes(combineInstances.ToArray(), true, false);
+        combinedMesh.RecalculateNormals();
+
+        return combinedMesh;
+    }
+
 
 }
