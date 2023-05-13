@@ -126,10 +126,41 @@ public class MeshGenerator
     {
         Mesh combinedMesh = new Mesh();
         List<CombineInstance> combineInstances = new List<CombineInstance>();
-
         foreach (Branch branch in branches)
         {
-            List<TreeVertex> branchVerticesList = branch.Vertices;
+            // 根据 SelfGrowthFactor 裁剪顶点列表
+            int actualVertexCount = 0;
+            for (int i = 0; i < branch.Vertices.Count; i++)
+            {
+                if (branch.LengthRatios[i] <= branch.SelfGrowthFactor)
+                {
+                    actualVertexCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // if (branch.Vertices.Count == 6){
+            //     Debug.Log("branch.LengthRatios " + branch.LengthRatios[0] + " " 
+            //     + branch.LengthRatios[1] + " " + branch.LengthRatios[2] 
+            //     + " " + branch.LengthRatios[3] + " " 
+            //     + branch.LengthRatios[4] + " " + branch.LengthRatios[5]); 
+            //     Debug.Log("original vertex count: " + branch.Vertices.Count + ", actual vertex count: " + actualVertexCount);
+            // }
+
+
+
+            // 创建一个新的顶点列表，包含所需的顶点和插值顶点（如果有的话）
+            List<TreeVertex> branchVerticesList = branch.Vertices.GetRange(0, actualVertexCount);
+
+            // 添加插值顶点到顶点列表
+            if (branch.InterpolatedVertex != null)
+            {
+                branchVerticesList.Add(branch.InterpolatedVertex);
+            }
+
             Mesh branchMesh = MeshGenerator.CreateTrunkMesh(branchVerticesList, radialSegments, branchVerticesList.Count);
             CombineInstance combineInstance = new CombineInstance { mesh = branchMesh, transform = Matrix4x4.identity };
             combineInstances.Add(combineInstance);

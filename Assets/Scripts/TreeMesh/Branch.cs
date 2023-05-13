@@ -10,6 +10,7 @@ public class Branch
     public TreeVertex InterpolatedVertex { get; set; }
     public int Level { get; set; }
     public float SelfGrowthFactor { get; set; }
+    public float[] LengthRatios { get; set; }
     
     public Branch(int level)
     {
@@ -17,6 +18,7 @@ public class Branch
         InterpolatedVertex = null;
         Level = level;
         SelfGrowthFactor = 0.0f;
+        LengthRatios = new float[0];
     }
 
     public override string ToString()
