@@ -62,8 +62,6 @@ public class LeafUtils
             }
         }
 
-        Debug.Log($"Leaves: {leaves.Count}");
-
         return leaves;
     }
 

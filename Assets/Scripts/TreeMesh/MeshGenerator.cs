@@ -7,24 +7,28 @@ public class MeshGenerator
     {
         Vector3[] trunkVertices = trunkVerticesList.ConvertAll(vertex => vertex.Position).ToArray();
 
-        // 方法实现
-
         bool interpolation = actualTrunkVertexCount < trunkVerticesList.Count - 1;
         int interpolationVertexIndex = trunkVerticesList.Count - 1;
 
-        // Step 1: Create a new Mesh instance
         Mesh trunkMesh = new Mesh();
 
-        // Step 2: Create a ring for each vertex and store them in a vertex array
-        // int vertexCount = trunkVertices.Length * (radialSegments + 1);
         int vertexCount = (actualTrunkVertexCount + (interpolation ? 1 : 0)) * (radialSegments + 1);
         Vector3[] vertices = new Vector3[vertexCount];
         Vector2[] uv = new Vector2[vertexCount];
 
+        Vector3 upDirection = Vector3.up;
 
         for (int i = 0; i < actualTrunkVertexCount; i++)
         {
             float trunkRadius = trunkVerticesList[i].RadiusX * trunkVerticesList[i].RadiusScale;
+
+            if (i < actualTrunkVertexCount - 1)
+            {
+                upDirection = (trunkVertices[i + 1] - trunkVertices[i]).normalized;
+            }
+
+            Vector3 rightDirection = Vector3.Cross(upDirection, Vector3.forward).normalized;
+            Vector3 forwardDirection = Vector3.Cross(rightDirection, upDirection).normalized;
 
             for (int j = 0; j <= radialSegments; j++)
             {
@@ -32,28 +36,28 @@ public class MeshGenerator
                 float x = trunkRadius * Mathf.Cos(angle);
                 float z = trunkRadius * Mathf.Sin(angle);
 
-                Vector3 vertexOffset = new Vector3(x, 0, z);
+                Vector3 vertexOffset = rightDirection * x + forwardDirection * z;
                 vertices[i * (radialSegments + 1) + j] = trunkVertices[i] + vertexOffset;
                 uv[i * (radialSegments + 1) + j] = new Vector2((float)j / radialSegments, (float)i / (actualTrunkVertexCount - 1));
             }
 
             if (interpolation && i == actualTrunkVertexCount - 1)
             {
+                trunkRadius = trunkVerticesList[interpolationVertexIndex].RadiusX * trunkVerticesList[interpolationVertexIndex].RadiusScale;
                 for (int j = 0; j <= radialSegments; j++)
                 {
-                    trunkRadius = trunkVerticesList[interpolationVertexIndex].RadiusX * trunkVerticesList[interpolationVertexIndex].RadiusScale;
                     float angle = 2 * Mathf.PI * j / radialSegments;
                     float x = trunkRadius * Mathf.Cos(angle);
                     float z = trunkRadius * Mathf.Sin(angle);
 
-                    Vector3 vertexOffset = new Vector3(x, 0, z);
+                    Vector3 vertexOffset = rightDirection * x + forwardDirection * z;
                     vertices[(i+1) * (radialSegments + 1) + j] = trunkVertices[interpolationVertexIndex] + vertexOffset;
                     uv[(i+1) * (radialSegments + 1) + j] = new Vector2((float)j / radialSegments, (float)(i+1) / (actualTrunkVertexCount - 1));
                 }
             }
+
         }
 
-        // Step 3: Create triangles based on the vertex array and store them in a triangle array
         int[] triangles = new int[(actualTrunkVertexCount + (interpolation ? 0 : -1)) * radialSegments * 6];
 
         if (actualTrunkVertexCount == 1 && interpolation)
@@ -108,17 +112,15 @@ public class MeshGenerator
             }
         }
 
-
-        // Step 4: Assign the vertex array and triangle array to the Mesh
         trunkMesh.vertices = vertices;
         trunkMesh.triangles = triangles;
         trunkMesh.uv = uv;
         trunkMesh.RecalculateNormals();
 
-        // Step 5: Return the Mesh
         return trunkMesh;
-        //
     }
+
+
 
     public static Mesh CreateBranchesMesh(List<Branch> branches, int radialSegments, bool sub = false)
     {
@@ -173,11 +175,6 @@ public class MeshGenerator
                 // 顶点半径
                 float radiusScale = Mathf.Lerp(branch.MinRadiusFactor, branch.MaxRadiusFactor, branch.SelfGrowthFactor);
                 currentVertex.RadiusScale = radiusScale;
-
-
-                if (sub){
-                    Debug.Log(radiusScale);
-                }
             }
 
             // 更新插值顶点
