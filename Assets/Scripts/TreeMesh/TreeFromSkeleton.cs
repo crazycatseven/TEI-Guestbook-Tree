@@ -8,7 +8,7 @@ public class TreeFromSkeleton : MonoBehaviour
     public float growthFactor = 0.0f;
 
     [SerializeField]
-    private int radialSegments = 8;
+    private int radialSegments = 16;
 
 
     public float trunkMinRadiusFactor = 0.75f;
@@ -22,6 +22,8 @@ public class TreeFromSkeleton : MonoBehaviour
     private List<TreeVertex> trunkVertices;
 
     private List<Branch> branches;
+
+    private List<Leaf> leaves;
 
     private List<Branch> subBranches;
 
@@ -72,7 +74,6 @@ public class TreeFromSkeleton : MonoBehaviour
         }
 
 
-
         // 1.4 设置树枝的长度比例
         foreach (Branch branch in branches)
         {
@@ -83,7 +84,19 @@ public class TreeFromSkeleton : MonoBehaviour
                 branchTotalLength += Vector3.Distance(branch.Vertices[i].Position, branch.Vertices[i + 1].Position);
             }
 
+            // 设置树枝的长度比例与起始生长因子组
             branch.LengthRatios = new float[branch.Vertices.Count];
+            branch.StartGlobalGrowthFactors = new float[branch.Vertices.Count];
+
+            // 把起始点设置为分叉点
+            branch.Vertices[0].IsFork = true;
+
+            // 寻找起始顶点的index
+            int startVertexIndex = branch.Vertices[0].Index;
+
+            // 在树干顶点组中找到起始顶点
+            float startVertexLengthRatio = trunkVertices.Find(vertex => vertex.Index == startVertexIndex).LengthRatio;
+            
             currentLength = 0;
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
@@ -96,11 +109,14 @@ public class TreeFromSkeleton : MonoBehaviour
                 }else{
                     currentLength += Vector3.Distance(branch.Vertices[i].Position, branch.Vertices[i + 1].Position);
                 }
+
+                branch.StartGlobalGrowthFactors[i] = startVertexLengthRatio + branch.LengthRatios[i] * (1 - startVertexLengthRatio);
             }
 
             // 设置树枝的最小半径和最大半径
             branch.MinRadiusFactor = branchMinRadiusFactor;
             branch.MaxRadiusFactor = branchMaxRadiusFactor;
+
         }
 
         // 1.5 设置子树枝的长度比例
@@ -114,6 +130,7 @@ public class TreeFromSkeleton : MonoBehaviour
             }
 
             branch.LengthRatios = new float[branch.Vertices.Count];
+
             currentLength = 0;
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
@@ -143,18 +160,27 @@ public class TreeFromSkeleton : MonoBehaviour
             {
                 // 如果子树枝的起始顶点在树枝的定点组中，则把子树枝添加到树枝的子树枝列表中
 
-                foreach (TreeVertex vertex in branch.Vertices)
+                for (int i = 0; i < branch.Vertices.Count; i++)
                 {
-                    if (subBranch.Vertices[0].Index == vertex.Index)
+                    if (subBranch.Vertices[0].Index == branch.Vertices[i].Index)
                     {
+                        subBranch.Vertices[0].IsFork = true;
+                        branch.Vertices[i].IsFork = true;
+
+
                         branch.SubBranches.Add(subBranch);
+
+                        subBranch.StartGlobalGrowthFactors = new float[subBranch.Vertices.Count];
+                        for (int j = 0; j < subBranch.Vertices.Count; j++)
+                        {
+                            subBranch.StartGlobalGrowthFactors[j] = branch.StartGlobalGrowthFactors[i] 
+                                + subBranch.LengthRatios[j] * (1 - branch.StartGlobalGrowthFactors[i]);
+                        }
                         break;
                     }
                 }
             }
         }
-
-
         
         // 2. 使用解析出的顶点创建树干网格
         Mesh trunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, trunkVertices.Count - 1);
@@ -178,6 +204,27 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
+
+
+        // 5. 获得所有树叶
+        leaves = LeafUtils.GetLeaves(branches);
+
+        // 创建叶子的网格
+        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f);
+
+        // 创建一个新的子游戏对象
+        GameObject leavesObject = new GameObject("LeafObject");
+
+        // 把新的子游戏对象设置为当前游戏对象的子对象
+        leavesObject.transform.parent = this.transform;
+
+        // 把叶子的网格赋给新的子游戏对象的 MeshFilter 组件
+        MeshFilter leavesMeshFilter = leavesObject.AddComponent<MeshFilter>();
+        leavesMeshFilter.mesh = leavesMesh;
+
+        // 为叶子添加 MeshRenderer
+        MeshRenderer leavesMeshRenderer = leavesObject.AddComponent<MeshRenderer>();
+
     }
 
     
@@ -192,12 +239,32 @@ public class TreeFromSkeleton : MonoBehaviour
             
             foreach (Branch branch in branches)
             {
-                branchesMesh = CombineMeshes(branchesMesh, MeshGenerator.CreateBranchesMesh(branch.SubBranches, radialSegments));
+                branchesMesh = CombineMeshes(branchesMesh, MeshGenerator.CreateBranchesMesh(branch.SubBranches, radialSegments, true));
             } 
 
-
             Mesh combinedMesh = CombineMeshes(updatedTrunkMesh, branchesMesh);
+
             meshFilter.mesh = combinedMesh;
+
+            // Create leaves mesh
+            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor);
+
+            // Find the leaf object
+            Transform leafTransform = transform.Find("LeafObject");
+            if (leafTransform == null)
+            {
+                // The leaf object does not exist, create it
+                GameObject leafObject = new GameObject("LeafObject");
+                leafObject.transform.parent = transform;
+                leafObject.AddComponent<MeshFilter>();
+                leafObject.AddComponent<MeshRenderer>();
+                leafTransform = leafObject.transform;
+            }
+
+            // Update the mesh of the leaf object
+            MeshFilter leafMeshFilter = leafTransform.GetComponent<MeshFilter>();
+            leafMeshFilter.mesh = leavesMesh;
+
             treeUpdated = false;
         }
     }
@@ -285,17 +352,14 @@ public class TreeFromSkeleton : MonoBehaviour
             branch.MinRadiusFactor = branchMinRadiusFactor;
             branch.MaxRadiusFactor = branchMaxRadiusFactor;
 
-            // 寻找起始顶点的index
-            int startVertexIndex = branch.Vertices[0].Index;
-
             // 在树干顶点组中找到起始顶点
-            float startVertexLengthRatio = trunkVertices.Find(vertex => vertex.Index == startVertexIndex).LengthRatio;
+            float startFromStartGlobalGrowthFactor = branch.StartGlobalGrowthFactors[0];
 
-            if ( growthFactor >= startVertexLengthRatio)
+            if ( growthFactor >= startFromStartGlobalGrowthFactor)
             {
                 
                 // 计算树枝的 SelfGrowthFactor
-                branch.SelfGrowthFactor = (growthFactor - startVertexLengthRatio) / (1 - startVertexLengthRatio);
+                branch.SelfGrowthFactor = (growthFactor - startFromStartGlobalGrowthFactor) / (1 - startFromStartGlobalGrowthFactor);
 
             }else{
                 branch.SelfGrowthFactor = 0;
@@ -305,6 +369,10 @@ public class TreeFromSkeleton : MonoBehaviour
 
             foreach (Branch subBranch in branch.SubBranches)
             {
+
+                           // 设置树枝的最小半径和最大半径
+                subBranch.MinRadiusFactor = branchMinRadiusFactor;
+                subBranch.MaxRadiusFactor = branchMaxRadiusFactor;
 
                 // 寻找子树枝的起始顶点的index
                 int subBranchStartVertexIndex = subBranch.Vertices[0].Index;

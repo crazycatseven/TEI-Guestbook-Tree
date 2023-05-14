@@ -10,6 +10,7 @@ public class Branch
     public List<Branch> SubBranches { get; set; }
     public TreeVertex InterpolatedVertex { get; set; }
     public int Level { get; set; }
+    public float[] StartGlobalGrowthFactors { get; set; }
     public float SelfGrowthFactor { get; set; }
     public float[] LengthRatios { get; set; }
     public float MinRadiusFactor;
@@ -22,6 +23,7 @@ public class Branch
         SubBranches = new List<Branch>();
         InterpolatedVertex = null;
         Level = level;
+        StartGlobalGrowthFactors = new float[0];
         SelfGrowthFactor = 0.0f;
         LengthRatios = new float[0];
         MinRadiusFactor = 0.5f;

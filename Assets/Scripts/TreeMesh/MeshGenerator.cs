@@ -22,8 +22,6 @@ public class MeshGenerator
         Vector2[] uv = new Vector2[vertexCount];
 
 
-        // Debug.Log("actualTrunkVertexCount: " + actualTrunkVertexCount);
-
         for (int i = 0; i < actualTrunkVertexCount; i++)
         {
             float trunkRadius = trunkVerticesList[i].RadiusX * trunkVerticesList[i].RadiusScale;
@@ -122,7 +120,7 @@ public class MeshGenerator
         //
     }
 
-    public static Mesh CreateBranchesMesh(List<Branch> branches, int radialSegments)
+    public static Mesh CreateBranchesMesh(List<Branch> branches, int radialSegments, bool sub = false)
     {
         Mesh combinedMesh = new Mesh();
         List<CombineInstance> combineInstances = new List<CombineInstance>();
@@ -130,6 +128,7 @@ public class MeshGenerator
         TreeVertex nextVertex = null;
         foreach (Branch branch in branches)
         {
+
             if (branch.SelfGrowthFactor == 0)
             {
                 continue;
@@ -139,7 +138,6 @@ public class MeshGenerator
             int actualVertexCount = 0;
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
-                // Debug.Log("branch.LengthRatios " + i + " " + branch.LengthRatios[i] + " " + branch.SelfGrowthFactor);
                 if (branch.LengthRatios[i] <= branch.SelfGrowthFactor)
                 {
                     actualVertexCount++;
@@ -169,14 +167,17 @@ public class MeshGenerator
             }
 
 
-
-
             // 调整顶点半径
             for (int i = 0; i < actualVertexCount; i++){
                 TreeVertex currentVertex = branch.Vertices[i];
                 // 顶点半径
                 float radiusScale = Mathf.Lerp(branch.MinRadiusFactor, branch.MaxRadiusFactor, branch.SelfGrowthFactor);
                 currentVertex.RadiusScale = radiusScale;
+
+
+                if (sub){
+                    Debug.Log(radiusScale);
+                }
             }
 
             // 更新插值顶点
@@ -214,5 +215,74 @@ public class MeshGenerator
         return combinedMesh;
     }
 
+    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor)
+    {
+        Mesh combinedMesh = new Mesh();
+        List<CombineInstance> combineInstances = new List<CombineInstance>();
+        foreach (Leaf leaf in leaves)
+        {
+
+            if (leaf.StartGlobalGrowthFactor <= growthFactor)
+            {
+                Mesh leafMesh = MeshGenerator.CreateCubeMesh(growthFactor * 0.2f); // use leaf's scale for cube size
+
+                Matrix4x4 transformMatrix = Matrix4x4.TRS(leaf.Position, Quaternion.identity, Vector3.one);
+
+                CombineInstance combineInstance = new CombineInstance { mesh = leafMesh, transform = transformMatrix };
+
+                combineInstances.Add(combineInstance);
+            }
+
+
+        }
+
+        combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
+        combinedMesh.RecalculateNormals();
+
+        return combinedMesh;
+    }
+
+    public static Mesh CreateCubeMesh(float size = 1f)
+    {
+        Mesh cubeMesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[8];
+        int[] triangles = new int[36];
+
+        float halfSize = size * 0.5f;
+
+        // Define vertices.
+        vertices[0] = new Vector3(-halfSize, -halfSize, -halfSize);
+        vertices[1] = new Vector3(-halfSize, -halfSize, halfSize);
+        vertices[2] = new Vector3(-halfSize, halfSize, halfSize);
+        vertices[3] = new Vector3(-halfSize, halfSize, -halfSize);
+        vertices[4] = new Vector3(halfSize, -halfSize, -halfSize);
+        vertices[5] = new Vector3(halfSize, -halfSize, halfSize);
+        vertices[6] = new Vector3(halfSize, halfSize, halfSize);
+        vertices[7] = new Vector3(halfSize, halfSize, -halfSize);
+
+        // Define triangles.
+        triangles = new int[] 
+        {
+            0, 2, 1, //front face
+            0, 3, 2,
+            2, 3, 6, //top face
+            3, 7, 6,
+            1, 2, 5, //right face
+            2, 6, 5,
+            0, 7, 3, //left face
+            0, 4, 7,
+            5, 6, 4, //back face
+            6, 7, 4,
+            0, 1, 4, //bottom face
+            1, 5, 4
+        };
+
+        cubeMesh.vertices = vertices;
+        cubeMesh.triangles = triangles;
+        cubeMesh.RecalculateNormals();
+
+        return cubeMesh;
+    }
 
 }
