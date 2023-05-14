@@ -15,9 +15,15 @@ public class TreeFromSkeleton : MonoBehaviour
 
     public float trunkMaxRadiusFactor = 1.25f;
 
+    public float branchMinRadiusFactor = 0.25f;
+
+    public float branchMaxRadiusFactor = 1.25f;
+
     private List<TreeVertex> trunkVertices;
 
     private List<Branch> branches;
+
+    private List<Branch> subBranches;
 
     private float trunkTotalLength;
 
@@ -39,7 +45,9 @@ public class TreeFromSkeleton : MonoBehaviour
         // 1. 解析树干和树枝的顶点
         trunkVertices = TrunkParser.ParseTrunkVertices(trunkFilePath);
         branches = BranchParser.ParseBranches(trunkFilePath, 1);
-        
+        subBranches = BranchParser.ParseBranches(trunkFilePath, 2);
+
+                
         // 1.1 在树干顶点组最后添加一个顶点，作为预留的插值顶点
         TreeVertex emptyVertex = new TreeVertex(-1, Vector3.zero, Vector3.zero, 0, 0);
         trunkVertices.Add(emptyVertex);
@@ -90,17 +98,60 @@ public class TreeFromSkeleton : MonoBehaviour
                 }
             }
 
+            // 设置树枝的最小半径和最大半径
+            branch.MinRadiusFactor = branchMinRadiusFactor;
+            branch.MaxRadiusFactor = branchMaxRadiusFactor;
+        }
 
-            // Print the length ratios of the branch
-            foreach (float lengthRatio in branch.LengthRatios)
+        // 1.5 设置子树枝的长度比例
+        foreach (Branch branch in subBranches)
+        {
+            // 计算树枝的总长度
+            float branchTotalLength = 0;
+            for (int i = 0; i < branch.Vertices.Count - 1; i++)
             {
-                Debug.Log(lengthRatio);
+                branchTotalLength += Vector3.Distance(branch.Vertices[i].Position, branch.Vertices[i + 1].Position);
             }
 
-            Debug.Log("Branch total length: " + branchTotalLength);
+            branch.LengthRatios = new float[branch.Vertices.Count];
+            currentLength = 0;
+            for (int i = 0; i < branch.Vertices.Count; i++)
+            {
+                float lengthRatio = currentLength / branchTotalLength;
+                branch.LengthRatios[i] = lengthRatio;
+
+                if (i == branch.Vertices.Count - 1)
+                {
+                    branch.LengthRatios[i] = 1.0f;
+                }
+                else
+                {
+                    currentLength += Vector3.Distance(branch.Vertices[i].Position, branch.Vertices[i + 1].Position);
+                }
+            }
+
+            // 设置树枝的最小半径和最大半径
+            branch.MinRadiusFactor = branchMinRadiusFactor;
+            branch.MaxRadiusFactor = branchMaxRadiusFactor;
+        }
 
 
+        // 1.6 把子树枝添加到树枝的子树枝列表中
+        foreach (Branch branch in branches)
+        {
+            foreach (Branch subBranch in subBranches)
+            {
+                // 如果子树枝的起始顶点在树枝的定点组中，则把子树枝添加到树枝的子树枝列表中
 
+                foreach (TreeVertex vertex in branch.Vertices)
+                {
+                    if (subBranch.Vertices[0].Index == vertex.Index)
+                    {
+                        branch.SubBranches.Add(subBranch);
+                        break;
+                    }
+                }
+            }
         }
 
 
@@ -127,10 +178,6 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
-
-
-
-
     }
 
     
@@ -142,6 +189,11 @@ public class TreeFromSkeleton : MonoBehaviour
             UpdateBranches();
             Mesh updatedTrunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, actualVertexCount);
             Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
+            
+            foreach (Branch branch in branches)
+            {
+                branchesMesh = CombineMeshes(branchesMesh, MeshGenerator.CreateBranchesMesh(branch.SubBranches, radialSegments));
+            } 
 
 
             Mesh combinedMesh = CombineMeshes(updatedTrunkMesh, branchesMesh);
@@ -197,7 +249,7 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             TreeVertex vertex = trunkVertices[i];
             float radiusFactor = Mathf.Lerp(trunkMinRadiusFactor, trunkMaxRadiusFactor, growthFactor);
-            vertex.RadiusScale = radiusFactor ;
+            vertex.RadiusScale = radiusFactor;
         }
 
         // 计算插值后的位置
@@ -229,47 +281,58 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             Branch branch = branches[i];
 
+            // 设置树枝的最小半径和最大半径
+            branch.MinRadiusFactor = branchMinRadiusFactor;
+            branch.MaxRadiusFactor = branchMaxRadiusFactor;
+
             // 寻找起始顶点的index
             int startVertexIndex = branch.Vertices[0].Index;
 
             // 在树干顶点组中找到起始顶点
             float startVertexLengthRatio = trunkVertices.Find(vertex => vertex.Index == startVertexIndex).LengthRatio;
 
-
-            if (startVertexLengthRatio >= growthFactor)
+            if ( growthFactor >= startVertexLengthRatio)
             {
+                
                 // 计算树枝的 SelfGrowthFactor
                 branch.SelfGrowthFactor = (growthFactor - startVertexLengthRatio) / (1 - startVertexLengthRatio);
+
             }else{
                 branch.SelfGrowthFactor = 0;
+                continue;
             }
 
-            // 更新分支的顶点半径和插值顶点
-            for (int j = 0; j < branch.Vertices.Count - 1; j++)
+
+            foreach (Branch subBranch in branch.SubBranches)
             {
-                TreeVertex currentVertex = branch.Vertices[j];
-                TreeVertex nextVertex = branch.Vertices[j + 1];
 
-                float radiusScale = Mathf.Lerp(trunkMinRadiusFactor, trunkMaxRadiusFactor, branch.SelfGrowthFactor);
-                currentVertex.RadiusScale = radiusScale;
+                // 寻找子树枝的起始顶点的index
+                int subBranchStartVertexIndex = subBranch.Vertices[0].Index;
+                float subBranchStartVertexLengthRatio = -1.0f;
 
-                if (j == branch.Vertices.Count - 2) // 最后一个顶点之前
+
+                // 在树枝顶点组中找到子树枝的起始顶点
+                for (int j = 0; j < branch.Vertices.Count; j++)
                 {
-                    float t = branch.SelfGrowthFactor;
-                    Vector3 interpolatedPosition = Vector3.Lerp(currentVertex.Position, nextVertex.Position, t);
-                    float interpolatedRadiusX = Mathf.Lerp(currentVertex.RadiusX, nextVertex.RadiusX, t) * currentVertex.RadiusScale;
+                    if (branch.Vertices[j].Index == subBranchStartVertexIndex)
+                    {
+                        subBranchStartVertexLengthRatio = branch.LengthRatios[j];
+                        break;
+                    }
+                }
 
-                    // 更新插值顶点
-                    branch.InterpolatedVertex = new TreeVertex(
-                        nextVertex.Index,
-                        interpolatedPosition,
-                        nextVertex.Normal,
-                        interpolatedRadiusX,
-                        interpolatedRadiusX
-                    );
+                if (branch.SelfGrowthFactor >= subBranchStartVertexLengthRatio)
+                {
+                    // 计算subBranch的 SelfGrowthFactor
+                    subBranch.SelfGrowthFactor = (branch.SelfGrowthFactor - subBranchStartVertexLengthRatio) / (1 - subBranchStartVertexLengthRatio);
+                }
+                else
+                {
+                    subBranch.SelfGrowthFactor = 0;
                 }
             }
         }
+
     }
 
 

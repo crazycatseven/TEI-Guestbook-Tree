@@ -236,8 +236,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e55ad53e74dcbe24b9ab511ce7c7859e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growthFactor: 1
+  growthFactor: 0.505
   radialSegments: 8
+  trunkMinRadiusFactor: 0.25
+  trunkMaxRadiusFactor: 1.25
+  branchMinRadiusFactor: 0.5
+  branchMaxRadiusFactor: 1.25
 --- !u!4 &1061673803
 Transform:
   m_ObjectHideFlags: 0

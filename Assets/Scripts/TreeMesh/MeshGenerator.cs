@@ -126,12 +126,20 @@ public class MeshGenerator
     {
         Mesh combinedMesh = new Mesh();
         List<CombineInstance> combineInstances = new List<CombineInstance>();
+        TreeVertex lastVertex = null;
+        TreeVertex nextVertex = null;
         foreach (Branch branch in branches)
         {
+            if (branch.SelfGrowthFactor == 0)
+            {
+                continue;
+            }
+
             // 根据 SelfGrowthFactor 裁剪顶点列表
             int actualVertexCount = 0;
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
+                // Debug.Log("branch.LengthRatios " + i + " " + branch.LengthRatios[i] + " " + branch.SelfGrowthFactor);
                 if (branch.LengthRatios[i] <= branch.SelfGrowthFactor)
                 {
                     actualVertexCount++;
@@ -142,14 +150,48 @@ public class MeshGenerator
                 }
             }
 
-            // if (branch.Vertices.Count == 6){
-            //     Debug.Log("branch.LengthRatios " + branch.LengthRatios[0] + " " 
-            //     + branch.LengthRatios[1] + " " + branch.LengthRatios[2] 
-            //     + " " + branch.LengthRatios[3] + " " 
-            //     + branch.LengthRatios[4] + " " + branch.LengthRatios[5]); 
-            //     Debug.Log("original vertex count: " + branch.Vertices.Count + ", actual vertex count: " + actualVertexCount);
-            // }
+            // 插值系数
+            float t = 0;
 
+            // 从顶点列表中获取当前最新实际的顶点
+            lastVertex = branch.Vertices[actualVertexCount - 1];
+
+            // 从树枝顶点列表中获取下一个顶点，如果当前顶点是树枝顶点列表中的最后一个顶点，则下一个顶点为插值顶点
+            if (branch.LengthRatios[actualVertexCount - 1] < 1)
+            {
+                nextVertex = branch.Vertices[actualVertexCount];
+                t = (branch.SelfGrowthFactor - branch.LengthRatios[actualVertexCount - 1]) 
+                / (branch.LengthRatios[actualVertexCount] - branch.LengthRatios[actualVertexCount - 1]);
+            }
+            else
+            {
+                nextVertex = lastVertex;
+            }
+
+
+
+
+            // 调整顶点半径
+            for (int i = 0; i < actualVertexCount; i++){
+                TreeVertex currentVertex = branch.Vertices[i];
+                // 顶点半径
+                float radiusScale = Mathf.Lerp(branch.MinRadiusFactor, branch.MaxRadiusFactor, branch.SelfGrowthFactor);
+                currentVertex.RadiusScale = radiusScale;
+            }
+
+            // 更新插值顶点
+            if (t > 0){
+                Vector3 interpolatedPosition = Vector3.Lerp(lastVertex.Position, nextVertex.Position, t);
+                float interpolatedRadiusX = Mathf.Lerp(lastVertex.RadiusX, nextVertex.RadiusX, t) * lastVertex.RadiusScale;
+                branch.InterpolatedVertex = new TreeVertex(
+                    nextVertex.Index,
+                    interpolatedPosition,
+                    nextVertex.Normal,
+                    interpolatedRadiusX,
+                    interpolatedRadiusX);
+            }else{
+                branch.InterpolatedVertex = null;
+            }
 
 
             // 创建一个新的顶点列表，包含所需的顶点和插值顶点（如果有的话）

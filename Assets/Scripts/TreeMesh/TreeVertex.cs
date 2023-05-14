@@ -10,7 +10,7 @@ public class TreeVertex
     public float RadiusX { get; }
     public float RadiusY { get; }
     public float RadiusScale { get; set; }
-    public float[] LengthRatio { get; set; }
+    public float LengthRatio { get; set; }
 
 
     public TreeVertex(int index, Vector3 position, Vector3 normal, float radiusX, float radiusY)
