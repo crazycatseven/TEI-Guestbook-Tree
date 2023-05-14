@@ -6,7 +6,6 @@ public class MeshGenerator
     public static Mesh CreateTrunkMesh(List<TreeVertex> trunkVerticesList, int radialSegments, int actualTrunkVertexCount)
     {
 
-        Debug.Log("actualTrunkVertexCount: " + actualTrunkVertexCount);
         Vector3[] trunkVertices = trunkVerticesList.ConvertAll(vertex => vertex.Position).ToArray();
 
         bool interpolation = actualTrunkVertexCount < trunkVerticesList.Count - 1;
@@ -15,6 +14,7 @@ public class MeshGenerator
         Mesh trunkMesh = new Mesh();
 
         int vertexCount = (actualTrunkVertexCount + (interpolation ? 1 : 0)) * (radialSegments + 1);
+
         Vector3[] vertices = new Vector3[vertexCount];
         Vector2[] uv = new Vector2[vertexCount];
 
@@ -24,10 +24,10 @@ public class MeshGenerator
         {
             float trunkRadius = trunkVerticesList[i].RadiusX * trunkVerticesList[i].RadiusScale;
 
-            if (i < actualTrunkVertexCount - 1)
-            {
-                upDirection = (trunkVertices[i + 1] - trunkVertices[i]).normalized;
-            }
+            if (i < trunkVertices.Length - 1)
+                {
+                    upDirection = (trunkVertices[i + 1] - trunkVertices[i]).normalized;
+                }
 
             Vector3 rightDirection = Vector3.Cross(upDirection, Vector3.forward).normalized;
             Vector3 forwardDirection = Vector3.Cross(rightDirection, upDirection).normalized;
@@ -55,6 +55,7 @@ public class MeshGenerator
                     Vector3 vertexOffset = rightDirection * x + forwardDirection * z;
                     vertices[(i+1) * (radialSegments + 1) + j] = trunkVertices[interpolationVertexIndex] + vertexOffset;
                     uv[(i+1) * (radialSegments + 1) + j] = new Vector2((float)j / radialSegments, (float)(i+1) / (actualTrunkVertexCount - 1));
+                    // TODO: fix UVs, 当actualTrunkVertexCount == 1时，uv[(i+1) * (radialSegments + 1) + j] = 0
                 }
             }
 
@@ -214,12 +215,15 @@ public class MeshGenerator
         return combinedMesh;
     }
 
-    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor)
+    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber)
     {
         Mesh combinedMesh = new Mesh();
         List<CombineInstance> combineInstances = new List<CombineInstance>();
-        foreach (Leaf leaf in leaves)
+
+
+        for (int i = 0; i < Mathf.Min(leafNumber, leaves.Count); i++)
         {
+            Leaf leaf = leaves[i];
 
             if (leaf.StartGlobalGrowthFactor <= growthFactor)
             {
@@ -231,9 +235,8 @@ public class MeshGenerator
 
                 combineInstances.Add(combineInstance);
             }
-
-
         }
+
 
         combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
         combinedMesh.RecalculateNormals();

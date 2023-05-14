@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TreeFromSkeleton : MonoBehaviour
 {
 
     public Material barkMaterial;
+
     [Range(0, 1)]
     public float growthFactor = 0.0f;
+
+    [Range(0, 100)]
+    public int leavesNumber = 10;
 
     [SerializeField]
     private int radialSegments = 16;
@@ -41,11 +46,47 @@ public class TreeFromSkeleton : MonoBehaviour
 
     private int actualVertexCount;
 
-    private bool treeUpdated = false;
+    public bool treeUpdated = false;
+
+    private bool autoGrow = false;
+
+    #region UI
+    public Canvas canvas;
+    private Text growthFactorText;
+    private Text leavesNumberText;
+    private Text leavesAvailableText;
+    #endregion
+
+    #region Camera
+    public CameraController cameraController;
+    private Vector3 nextCameraPosition;
+    #endregion
+
 
     // Start is called before the first frame update
     void Start()
     {
+
+
+        #region UI Event
+        Transform panel = canvas.transform.Find("Panel");
+        Button addLeafButton = panel.Find("AddLeafButton").GetComponent<Button>();
+        addLeafButton.onClick.AddListener(AddLeafEvent);
+
+        // Text
+        growthFactorText = panel.Find("GrowthFactorText").GetComponent<Text>();
+        growthFactorText.text = $"Growth Factor: {growthFactor}";
+
+        leavesNumberText = panel.Find("LeavesNumberText").GetComponent<Text>();
+        leavesAvailableText = panel.Find("LeavesAvailableText").GetComponent<Text>();
+        #endregion
+
+        #region Camera
+
+        cameraController = FindObjectOfType<CameraController>();
+        #endregion
+
+
         // 1. 解析树干和树枝的顶点
         trunkVertices = TrunkParser.ParseTrunkVertices(trunkFilePath);
         branches = BranchParser.ParseBranches(trunkFilePath, 1);
@@ -214,7 +255,7 @@ public class TreeFromSkeleton : MonoBehaviour
         leaves = LeafUtils.GetLeaves(branches);
 
         // 创建叶子的网格
-        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f);
+        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber);
 
         // 创建一个新的子游戏对象
         GameObject leavesObject = new GameObject("LeafObject");
@@ -229,15 +270,32 @@ public class TreeFromSkeleton : MonoBehaviour
         // 为叶子添加 MeshRenderer
         MeshRenderer leavesMeshRenderer = leavesObject.AddComponent<MeshRenderer>();
 
+
+        treeUpdated = true;
+
     }
 
     
     void Update()
     {
-        if (treeUpdated)
+        if (treeUpdated || autoGrow)
         {
+            if (autoGrow)
+            {
+                int availableLeavesNumber = LeafUtils.GetAvailableLeavesNumber(leaves, growthFactor);
+                if (availableLeavesNumber <= leavesNumber)
+                {
+                    growthFactor += 0.0001f;
+                }
+                else{
+                    autoGrow = false;
+                    MoveCameraToTarget(nextCameraPosition);
+                }
+                
+            }
             UpdateTrunk();
             UpdateBranches();
+            UpdateUI();
             Mesh updatedTrunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, actualVertexCount);
             Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
             
@@ -251,7 +309,7 @@ public class TreeFromSkeleton : MonoBehaviour
             meshFilter.mesh = combinedMesh;
 
             // Create leaves mesh
-            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor);
+            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber);
 
             // Find the leaf object
             Transform leafTransform = transform.Find("LeafObject");
@@ -407,6 +465,15 @@ public class TreeFromSkeleton : MonoBehaviour
 
     }
 
+    public void MoveCameraToTarget(Vector3 target)
+    {
+        // 设置相机控制器的目标位置为传递的目标位置参数
+        cameraController.targetPosition = target;
+
+        // 调用相机控制器的启动相机移动协程方法
+        StartCoroutine(cameraController.MoveCamera());
+    }
+
 
 
     // 合并两个 Mesh 对象的方法
@@ -428,5 +495,31 @@ public class TreeFromSkeleton : MonoBehaviour
     }
 
 
+    private void UpdateUI()
+    {
+        growthFactorText.text = $"Growth Factor: {growthFactor}";
+        leavesNumberText.text = $"Leaves Number: {leavesNumber}";
+        leavesAvailableText.text = $"Leaves Available: {LeafUtils.GetAvailableLeavesNumber(leaves, growthFactor)}";
+    }
+
+
+    private void AddLeafEvent()
+    {
+        if (leavesNumber == leaves.Count)
+        {
+            return;
+        }
+
+        int availableLeavesNumber = LeafUtils.GetAvailableLeavesNumber(leaves, growthFactor);
+
+        if (availableLeavesNumber > leavesNumber)
+        {
+            leavesNumber++;
+            treeUpdated = true;
+        }else{
+            nextCameraPosition = LeafUtils.GetNextAvailableLeafPosition(leaves, growthFactor);
+            autoGrow = true;
+        }
+    }
 
 }

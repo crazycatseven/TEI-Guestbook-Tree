@@ -8,6 +8,8 @@ public class LeafUtils
     public static float InterpolationThreshold = 0.3f;
     public static List<Leaf> GetLeaves(List<Branch> branches)
     {
+        // Set random seed
+        Random.InitState(42);
         List<Leaf> leaves = new List<Leaf>();
         foreach (Branch branch in branches)
         {
@@ -62,7 +64,36 @@ public class LeafUtils
             }
         }
 
+        leaves.Sort((a, b) => a.StartGlobalGrowthFactor.CompareTo(b.StartGlobalGrowthFactor));
+
         return leaves;
     }
+
+    public static int GetAvailableLeavesNumber(List<Leaf> leaves, float currentGrowthFactor)
+    {
+        int leavesNumber = 0;
+        foreach (Leaf leaf in leaves)
+        {
+            if (leaf.StartGlobalGrowthFactor <= currentGrowthFactor)
+            {
+                leavesNumber++;
+            }
+        }
+        return leavesNumber;
+    }
+
+    public static Vector3 GetNextAvailableLeafPosition(List<Leaf> leaves, float currentGrowthFactor)
+    {
+        foreach (Leaf leaf in leaves)
+        {
+            if (leaf.StartGlobalGrowthFactor > currentGrowthFactor)
+            {
+                return leaf.Position;
+            }
+        }
+        return Vector3.zero;
+    }
+
+
 
 }
