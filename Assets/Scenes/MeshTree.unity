@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e55ad53e74dcbe24b9ab511ce7c7859e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  barkMaterial: {fileID: 2100000, guid: 71a1f9b71c6669e40ab29a6a5c2caa3e, type: 2}
   growthFactor: 0.454
   radialSegments: 8
   trunkMinRadiusFactor: 0.25

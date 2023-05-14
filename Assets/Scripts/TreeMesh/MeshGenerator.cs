@@ -5,6 +5,8 @@ public class MeshGenerator
 {
     public static Mesh CreateTrunkMesh(List<TreeVertex> trunkVerticesList, int radialSegments, int actualTrunkVertexCount)
     {
+
+        Debug.Log("actualTrunkVertexCount: " + actualTrunkVertexCount);
         Vector3[] trunkVertices = trunkVerticesList.ConvertAll(vertex => vertex.Position).ToArray();
 
         bool interpolation = actualTrunkVertexCount < trunkVerticesList.Count - 1;

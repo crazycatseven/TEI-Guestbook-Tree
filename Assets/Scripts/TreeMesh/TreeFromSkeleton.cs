@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TreeFromSkeleton : MonoBehaviour
 {
+
+    public Material barkMaterial;
     [Range(0, 1)]
     public float growthFactor = 0.0f;
 
@@ -204,6 +206,8 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
+        meshRenderer.material = barkMaterial;
+
 
 
         // 5. 获得所有树叶
