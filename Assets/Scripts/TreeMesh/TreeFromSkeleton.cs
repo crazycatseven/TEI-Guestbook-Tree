@@ -17,6 +17,8 @@ public class TreeFromSkeleton : MonoBehaviour
     [SerializeField]
     private int radialSegments = 16;
 
+    public GameObject leafPrefab;
+
 
     public float trunkMinRadiusFactor = 0.75f;
 
@@ -255,7 +257,7 @@ public class TreeFromSkeleton : MonoBehaviour
         leaves = LeafUtils.GetLeaves(branches);
 
         // 创建叶子的网格
-        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber);
+        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber, leafPrefab);
 
         // 创建一个新的子游戏对象
         GameObject leavesObject = new GameObject("LeafObject");
@@ -309,7 +311,7 @@ public class TreeFromSkeleton : MonoBehaviour
             meshFilter.mesh = combinedMesh;
 
             // Create leaves mesh
-            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber);
+            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber, leafPrefab);
 
             // Find the leaf object
             Transform leafTransform = transform.Find("LeafObject");

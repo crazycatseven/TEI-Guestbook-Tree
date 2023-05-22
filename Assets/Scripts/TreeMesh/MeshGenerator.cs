@@ -215,7 +215,7 @@ public class MeshGenerator
         return combinedMesh;
     }
 
-    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber)
+    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber, GameObject leafPrefab)
     {
         Mesh combinedMesh = new Mesh();
         List<CombineInstance> combineInstances = new List<CombineInstance>();
@@ -227,7 +227,10 @@ public class MeshGenerator
 
             if (leaf.StartGlobalGrowthFactor <= growthFactor)
             {
-                Mesh leafMesh = MeshGenerator.CreateCubeMesh(growthFactor * 0.2f); // use leaf's scale for cube size
+                // Instantiate the leaf prefab and get its MeshFilter's mesh
+                GameObject leafObject = GameObject.Instantiate(leafPrefab);
+                Mesh leafMesh = leafObject.GetComponent<MeshFilter>().sharedMesh;
+                GameObject.Destroy(leafObject);
 
                 Matrix4x4 transformMatrix = Matrix4x4.TRS(leaf.Position, Quaternion.identity, Vector3.one);
 
