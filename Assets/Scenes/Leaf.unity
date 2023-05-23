@@ -248,7 +248,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12d24274f7a90f41b24ef95ecd9442b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlPoint: {x: 0.5, y: 0.5}
+  controlPoint: {x: 0.25, y: 0.5}
+  offset: 0.1
   leafHeight: 1
   resolution: 100
 --- !u!23 &966733780
