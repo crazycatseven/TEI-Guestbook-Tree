@@ -54,6 +54,7 @@ public class TreeFromSkeleton : MonoBehaviour
 
     #region UI
     public Canvas canvas;
+    public GameObject customLeafCreatorCanvas;
     private Text growthFactorText;
     private Text leavesNumberText;
     private Text leavesAvailableText;
@@ -63,17 +64,17 @@ public class TreeFromSkeleton : MonoBehaviour
     public CameraController cameraController;
     private Vector3 nextCameraPosition;
     #endregion
-
+    
 
     // Start is called before the first frame update
     void Start()
     {
 
-
         #region UI Event
         Transform panel = canvas.transform.Find("Panel");
-        Button addLeafButton = panel.Find("AddLeafButton").GetComponent<Button>();
-        addLeafButton.onClick.AddListener(AddLeafEvent);
+        customLeafCreatorCanvas = GameObject.Find("CustomLeafCreator");
+        customLeafCreatorCanvas.SetActive(false);
+        
 
         // Text
         growthFactorText = panel.Find("GrowthFactorText").GetComponent<Text>();
@@ -470,12 +471,14 @@ public class TreeFromSkeleton : MonoBehaviour
     public void MoveCameraToTarget(Vector3 target)
     {
         // 设置相机控制器的目标位置为传递的目标位置参数
-        cameraController.targetPosition = target;
+        // cameraController.targetPosition = target;
 
-        // 调用相机控制器的启动相机移动协程方法
-        StartCoroutine(cameraController.MoveCamera());
+        // // 调用相机控制器的启动相机移动协程方法
+        // StartCoroutine(cameraController.MoveCamera());
+
+        StartCoroutine(cameraController.MoveCameraAndReturn(target, new Vector3(0, 3, -6), 2.0f));
+
     }
-
 
 
     // 合并两个 Mesh 对象的方法
@@ -505,8 +508,25 @@ public class TreeFromSkeleton : MonoBehaviour
     }
 
 
-    private void AddLeafEvent()
+    public void AddLeafEvent()
     {
+        // 隐藏UI和当前的GameObject
+        canvas.enabled = false;
+        gameObject.SetActive(false);
+
+
+        // 启用CustomLeafCreatorCanvas
+        customLeafCreatorCanvas.SetActive(true);
+
+    }
+
+    public void AddLeafEventContinue()
+    {
+        canvas.enabled = true;
+        gameObject.SetActive(true);
+        customLeafCreatorCanvas.SetActive(false);
+
+
         if (leavesNumber == leaves.Count)
         {
             return;
@@ -523,5 +543,4 @@ public class TreeFromSkeleton : MonoBehaviour
             autoGrow = true;
         }
     }
-
 }

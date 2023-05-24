@@ -616,6 +616,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   webGLPowerPreference: 2
   scriptingDefineSymbols:
+    PS4: AMPLIFY_SHADER_EDITOR
     Standalone: UDUINO_READY;UDUINO_MEGA_MESSAGE;AMPLIFY_SHADER_EDITOR
   additionalCompilerArguments: {}
   platformArchitecture: {}
