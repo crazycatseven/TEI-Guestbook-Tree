@@ -9,6 +9,7 @@ public class Leaf
     public Vector3 Normal { get; }
     public float StartGlobalGrowthFactor { get; set; }
     public float Scale { get; set; }
+    public LeafData LeafData { get; set; }
 
 
 
@@ -18,9 +19,9 @@ public class Leaf
         Position = position;
         Normal = Vector3.zero;
         StartGlobalGrowthFactor = startGlobalGrowthFactor;
-        Scale = 1.0f;
+        Scale = 0.5f;
+        LeafData = null;
     }
-
 
 
     public override string ToString()

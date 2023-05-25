@@ -674,7 +674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6, y: -388.3}
+  m_AnchoredPosition: {x: -6, y: -350}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &948225370
@@ -764,6 +764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leafShape: {fileID: 634975694}
+  treeFromSkeleton: {fileID: 0}
 --- !u!1 &1061673801
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,13 +799,13 @@ MonoBehaviour:
   growthFactor: 0
   leavesNumber: 0
   radialSegments: 8
-  leafPrefab: {fileID: 0}
   trunkMinRadiusFactor: 0.25
   trunkMaxRadiusFactor: 1.25
   branchMinRadiusFactor: 0.5
   branchMaxRadiusFactor: 1.25
   treeUpdated: 1
   canvas: {fileID: 1727044566}
+  customLeafCreatorCanvas: {fileID: 0}
   cameraController: {fileID: 0}
 --- !u!4 &1061673803
 Transform:
@@ -869,7 +870,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6, y: -417.1}
+  m_AnchoredPosition: {x: -6, y: -380}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1103040845
@@ -949,7 +950,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6, y: -360.81}
+  m_AnchoredPosition: {x: -6, y: -320}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1703763069

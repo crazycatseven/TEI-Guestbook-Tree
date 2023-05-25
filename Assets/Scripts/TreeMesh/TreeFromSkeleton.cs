@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static LeafDataUtils;
 
 public class TreeFromSkeleton : MonoBehaviour
 {
@@ -12,13 +13,10 @@ public class TreeFromSkeleton : MonoBehaviour
     public float growthFactor = 0.0f;
 
     [Range(0, 100)]
-    public int leavesNumber = 10;
+    public int leavesNumber = 0;
 
     [SerializeField]
     private int radialSegments = 16;
-
-    public GameObject leafPrefab;
-
 
     public float trunkMinRadiusFactor = 0.75f;
 
@@ -69,13 +67,11 @@ public class TreeFromSkeleton : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         #region UI Event
         Transform panel = canvas.transform.Find("Panel");
         customLeafCreatorCanvas = GameObject.Find("CustomLeafCreator");
         customLeafCreatorCanvas.SetActive(false);
         
-
         // Text
         growthFactorText = panel.Find("GrowthFactorText").GetComponent<Text>();
         growthFactorText.text = $"Growth Factor: {growthFactor}";
@@ -257,21 +253,24 @@ public class TreeFromSkeleton : MonoBehaviour
         // 5. 获得所有树叶
         leaves = LeafUtils.GetLeaves(branches);
 
-        // 创建叶子的网格
-        Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber, leafPrefab);
 
-        // 创建一个新的子游戏对象
-        GameObject leavesObject = new GameObject("LeafObject");
+        // MeshGenerator.CreateLeavesMesh(transform, leaves, growthFactor * 0.1f, leavesNumber);
 
-        // 把新的子游戏对象设置为当前游戏对象的子对象
-        leavesObject.transform.parent = this.transform;
+        // // 创建叶子的网格
+        // // Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber, leafPrefab);
 
-        // 把叶子的网格赋给新的子游戏对象的 MeshFilter 组件
-        MeshFilter leavesMeshFilter = leavesObject.AddComponent<MeshFilter>();
-        leavesMeshFilter.mesh = leavesMesh;
+        // // 创建一个新的子游戏对象
+        // GameObject leavesObject = new GameObject("LeafObject");
 
-        // 为叶子添加 MeshRenderer
-        MeshRenderer leavesMeshRenderer = leavesObject.AddComponent<MeshRenderer>();
+        // // 把新的子游戏对象设置为当前游戏对象的子对象
+        // leavesObject.transform.parent = this.transform;
+
+        // // 把叶子的网格赋给新的子游戏对象的 MeshFilter 组件
+        // MeshFilter leavesMeshFilter = leavesObject.AddComponent<MeshFilter>();
+        // leavesMeshFilter.mesh = leavesMesh;
+
+        // // 为叶子添加 MeshRenderer
+        // MeshRenderer leavesMeshRenderer = leavesObject.AddComponent<MeshRenderer>();
 
 
         treeUpdated = true;
@@ -292,10 +291,11 @@ public class TreeFromSkeleton : MonoBehaviour
                 }
                 else{
                     autoGrow = false;
-                    MoveCameraToTarget(nextCameraPosition);
+                    StartCoroutine(cameraController.MoveCameraAndReturn(nextCameraPosition, new Vector3(0, 3, -6), 2.0f));
                 }
                 
             }
+
             UpdateTrunk();
             UpdateBranches();
             UpdateUI();
@@ -312,23 +312,25 @@ public class TreeFromSkeleton : MonoBehaviour
             meshFilter.mesh = combinedMesh;
 
             // Create leaves mesh
-            Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber, leafPrefab);
+            // MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber, leafPrefab);
+            Debug.Log("before Create");
+            MeshGenerator.CreateLeavesMesh(transform, leaves, growthFactor, leavesNumber);
 
             // Find the leaf object
-            Transform leafTransform = transform.Find("LeafObject");
-            if (leafTransform == null)
-            {
-                // The leaf object does not exist, create it
-                GameObject leafObject = new GameObject("LeafObject");
-                leafObject.transform.parent = transform;
-                leafObject.AddComponent<MeshFilter>();
-                leafObject.AddComponent<MeshRenderer>();
-                leafTransform = leafObject.transform;
-            }
+            // Transform leafTransform = transform.Find("LeafObject");
+            // if (leafTransform == null)
+            // {
+            //     // The leaf object does not exist, create it
+            //     GameObject leafObject = new GameObject("LeafObject");
+            //     leafObject.transform.parent = transform;
+            //     leafObject.AddComponent<MeshFilter>();
+            //     leafObject.AddComponent<MeshRenderer>();
+            //     leafTransform = leafObject.transform;
+            // }
 
             // Update the mesh of the leaf object
-            MeshFilter leafMeshFilter = leafTransform.GetComponent<MeshFilter>();
-            leafMeshFilter.mesh = leavesMesh;
+            // MeshFilter leafMeshFilter = leafTransform.GetComponent<MeshFilter>();
+            // leafMeshFilter.mesh = leavesMesh;
 
             treeUpdated = false;
         }
@@ -468,18 +470,6 @@ public class TreeFromSkeleton : MonoBehaviour
 
     }
 
-    public void MoveCameraToTarget(Vector3 target)
-    {
-        // 设置相机控制器的目标位置为传递的目标位置参数
-        // cameraController.targetPosition = target;
-
-        // // 调用相机控制器的启动相机移动协程方法
-        // StartCoroutine(cameraController.MoveCamera());
-
-        StartCoroutine(cameraController.MoveCameraAndReturn(target, new Vector3(0, 3, -6), 2.0f));
-
-    }
-
 
     // 合并两个 Mesh 对象的方法
     private Mesh CombineMeshes(Mesh mesh1, Mesh mesh2)
@@ -517,10 +507,9 @@ public class TreeFromSkeleton : MonoBehaviour
 
         // 启用CustomLeafCreatorCanvas
         customLeafCreatorCanvas.SetActive(true);
-
     }
 
-    public void AddLeafEventContinue()
+    public void AddLeafEventContinue(LeafData data)
     {
         canvas.enabled = true;
         gameObject.SetActive(true);
@@ -533,6 +522,8 @@ public class TreeFromSkeleton : MonoBehaviour
         }
 
         int availableLeavesNumber = LeafUtils.GetAvailableLeavesNumber(leaves, growthFactor);
+
+        leaves[leavesNumber].LeafData = data;
 
         if (availableLeavesNumber > leavesNumber)
         {

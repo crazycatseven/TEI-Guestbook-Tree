@@ -11,8 +11,6 @@ public class CameraController : MonoBehaviour
 
     private bool isMoving = false; // 控制相机移动的开关
 
-    private int moveCount = 0;
-
     public TreeFromSkeleton treeFromSkeleton;
 
     private void Start()
@@ -64,39 +62,19 @@ public class CameraController : MonoBehaviour
             if (Vector3.Distance(transform.position, targetPos) < 1.0f)
             {
                 isMoving = false;
+                treeFromSkeleton.leavesNumber++;
+                treeFromSkeleton.treeUpdated = true;
+
                 if (delay > 0f)
                 {
                     yield return new WaitForSeconds(delay);
                 }
                 yield return StartCoroutine(MoveCamera(returnPos, 0.02f));
+
             }
 
             yield return null;
         }
     }
 
-    // 停止相机移动的方法
-    public void StopCameraMovement()
-    {
-        if (moveCount == 2)
-        {
-            moveCount = 0;
-            isMoving = false;
-        }
-        else
-        {
-            treeFromSkeleton.leavesNumber++;
-            treeFromSkeleton.treeUpdated = true;
-            isMoving = false;
-
-            targetPosition = new Vector3(0, 3, -6);
-            StartCoroutine(DelayedMoveCamera(2f));
-        }
-    }
-
-    private IEnumerator DelayedMoveCamera(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        StartCoroutine(MoveCamera(targetPosition));
-    }
 }

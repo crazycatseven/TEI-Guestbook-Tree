@@ -3,26 +3,6 @@ using System;
 using System.IO;
 using System.Linq;
 
-
-
-[Serializable]
-public class LeafData
-{
-    public int id;
-    public float controlPointX;
-    public float controlPointY;
-    public float controlPoint2X;
-    public float controlPoint2Y;
-    public float leafHeight;
-    public float leafThickness;
-    public int resolution;
-    public float leafHue;
-    public float leafSaturation;
-    public float leafBrightness;
-    public string creationDate;
-}
-
-
 public class CustomLeafShape : MonoBehaviour
 {
 
@@ -236,7 +216,7 @@ public class CustomLeafShape : MonoBehaviour
     }
 
 
-    public void SaveLeafData(string path)
+    public LeafData SaveLeafData(string path)
     {
         int id = 1;  // 默认id为1
         if (File.Exists(path))
@@ -272,6 +252,8 @@ public class CustomLeafShape : MonoBehaviour
 
         string line = $"{data.id},{data.controlPointX},{data.controlPointY},{data.controlPoint2X},{data.controlPoint2Y},{data.leafHeight},{data.leafThickness},{data.resolution},{data.leafHue},{data.leafSaturation},{data.leafBrightness},{data.creationDate}";
         File.AppendAllText(path, line + Environment.NewLine);  // 在文件末尾添加新的数据行
+
+        return data;
     }
 
 

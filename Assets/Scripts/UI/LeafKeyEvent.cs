@@ -39,10 +39,9 @@ public class LeafKeyEvent : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) // 如果回车键被按下
         {
-            leafShape.SaveLeafData("Assets/Data/leafData.csv");
-            treeFromSkeleton.AddLeafEventContinue();
+            LeafData data = leafShape.SaveLeafData("Assets/Data/leafData.csv");
+            treeFromSkeleton.AddLeafEventContinue(data);
             return;
-            
         }
 
         // 根据键盘输入更新每个属性

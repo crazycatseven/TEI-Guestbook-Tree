@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using static LeafDataUtils;
+using UnityEditor;
+
 
 public class MeshGenerator
 {
@@ -215,37 +218,105 @@ public class MeshGenerator
         return combinedMesh;
     }
 
-    public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber, GameObject leafPrefab)
+    // public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber, GameObject leafPrefab)
+    // {
+    //     Mesh combinedMesh = new Mesh();
+    //     List<CombineInstance> combineInstances = new List<CombineInstance>();
+
+
+    //     for (int i = 0; i < Mathf.Min(leafNumber, leaves.Count); i++)
+    //     {
+    //         Leaf leaf = leaves[i];
+
+    //         if (leaf.StartGlobalGrowthFactor <= growthFactor)
+    //         {
+    //             // Instantiate the leaf prefab and get its MeshFilter's mesh
+    //             GameObject leafObject = GameObject.Instantiate(leafPrefab);
+    //             Mesh leafMesh = leafObject.GetComponent<MeshFilter>().sharedMesh;
+    //             GameObject.Destroy(leafObject);
+
+    //             Matrix4x4 transformMatrix = Matrix4x4.TRS(leaf.Position, Quaternion.identity, Vector3.one);
+
+    //             CombineInstance combineInstance = new CombineInstance { mesh = leafMesh, transform = transformMatrix };
+
+    //             combineInstances.Add(combineInstance);
+    //         }
+    //     }
+
+
+    //     combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
+    //     combinedMesh.RecalculateNormals();
+
+    //     return combinedMesh;
+    // }
+
+    public static Mesh CreateLeavesMesh(Transform parentTransform, List<Leaf> leaves, float growthFactor, int leafNumber)
     {
-        Mesh combinedMesh = new Mesh();
-        List<CombineInstance> combineInstances = new List<CombineInstance>();
+
+        foreach (Transform child in parentTransform)
+        {
+            if (child.name == "Leaf")
+            {
+                // Destroy(child.gameObject);
+                UnityEngine.Object.Destroy(child.gameObject);
+            }
+        }
 
 
         for (int i = 0; i < Mathf.Min(leafNumber, leaves.Count); i++)
         {
             Leaf leaf = leaves[i];
 
+            GameObject leafObject = new GameObject("Leaf");
+            leafObject.transform.SetParent(parentTransform);
+
+            Debug.Log(leaf.StartGlobalGrowthFactor + "  " + growthFactor);
+
             if (leaf.StartGlobalGrowthFactor <= growthFactor)
             {
-                // Instantiate the leaf prefab and get its MeshFilter's mesh
-                GameObject leafObject = GameObject.Instantiate(leafPrefab);
-                Mesh leafMesh = leafObject.GetComponent<MeshFilter>().sharedMesh;
-                GameObject.Destroy(leafObject);
+
+                Mesh leafMesh = CreateMeshFromLeafData(leaf.LeafData);
 
                 Matrix4x4 transformMatrix = Matrix4x4.TRS(leaf.Position, Quaternion.identity, Vector3.one);
 
-                CombineInstance combineInstance = new CombineInstance { mesh = leafMesh, transform = transformMatrix };
+                MeshFilter meshFilter = leafObject.AddComponent<MeshFilter>();
+                MeshRenderer meshRenderer = leafObject.AddComponent<MeshRenderer>();
 
-                combineInstances.Add(combineInstance);
+                // 将Mesh赋值给MeshFilter
+                meshFilter.mesh = leafMesh;
+
+                // 设置材质为Assets/Materials/Leaf
+
+                string materialPath = "Assets/Material/Leaf.mat";
+
+                Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+
+                meshRenderer.material = material;
+
+                Color leafColor = Color.HSVToRGB(leaf.LeafData.leafHue, leaf.LeafData.leafSaturation, leaf.LeafData.leafBrightness);
+
+                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+
+                mpb.SetColor("_Color", leafColor);
+
+                meshRenderer.SetPropertyBlock(mpb);                
+
+                leafObject.transform.position = leaf.Position;
+
+                leafObject.transform.rotation = Quaternion.Euler(leaf.Normal);
+
+                leafObject.transform.localScale = Vector3.one * leaf.Scale;
+
+
+
+
             }
+
         }
-
-
-        combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
-        combinedMesh.RecalculateNormals();
-
-        return combinedMesh;
+        return null;
     }
+
+
 
     public static Mesh CreateCubeMesh(float size = 1f)
     {
