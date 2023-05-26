@@ -118,6 +118,31 @@ public static class LeafDataUtils
 
             float realLeafThickness = leafThickness /10;
 
+            // // Front face vertices
+            // vertices[i * 16] = new Vector3(point.x, point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 1] = new Vector3(point.x, -point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 2] = new Vector3(next_point.x, next_point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 3] = new Vector3(next_point.x, -next_point.y, -realLeafThickness / 2);
+
+            // // Back face vertices
+            // vertices[i * 16 + 4] = new Vector3(point.x, point.y, realLeafThickness / 2);
+            // vertices[i * 16 + 5] = new Vector3(point.x, -point.y, realLeafThickness / 2);
+            // vertices[i * 16 + 6] = new Vector3(next_point.x, next_point.y, realLeafThickness / 2);
+            // vertices[i * 16 + 7] = new Vector3(next_point.x, -next_point.y, realLeafThickness / 2);
+
+            // // Upper edge vertices
+            // vertices[i * 16 + 8] = new Vector3(point.x, point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 9] = new Vector3(next_point.x, next_point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 10] = new Vector3(point.x, point.y, realLeafThickness / 2);
+            // vertices[i * 16 + 11] = new Vector3(next_point.x, next_point.y, realLeafThickness / 2);
+
+            // // Lower edge vertices
+            // vertices[i * 16 + 12] = new Vector3(point.x, -point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 13] = new Vector3(next_point.x, -next_point.y, -realLeafThickness / 2);
+            // vertices[i * 16 + 14] = new Vector3(point.x, -point.y, realLeafThickness / 2);
+            // vertices[i * 16 + 15] = new Vector3(next_point.x, -next_point.y, realLeafThickness / 2);
+
+
             // Front face vertices
             vertices[i * 16] = new Vector3(point.y, point.x, -realLeafThickness / 2);
             vertices[i * 16 + 1] = new Vector3(-point.y, point.x, -realLeafThickness / 2);

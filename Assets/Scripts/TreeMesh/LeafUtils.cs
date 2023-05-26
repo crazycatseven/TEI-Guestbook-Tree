@@ -11,10 +11,15 @@ public class LeafUtils
         // Set random seed
         Random.InitState(42);
         List<Leaf> leaves = new List<Leaf>();
+
+        bool up = true; // Track which side the next leaf should grow on
+
         foreach (Branch branch in branches)
         {
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
+                // Get branch radius at current position
+                float radius = branch.Vertices[i].RadiusX;
 
                 if (branch.Vertices[i].IsFork != true)
                 {
@@ -34,8 +39,9 @@ public class LeafUtils
 
 
                     leaf.GrowthDirection = branchDirection;
-                    
+                    leaf.UpSide = up;
 
+                    up = !up; // Flip side for next leaf
 
                     leaves.Add(leaf);
                 }
@@ -50,6 +56,10 @@ public class LeafUtils
                         Vector3 interpolatedPosition = Vector3.Lerp(branch.Vertices[i].Position, branch.Vertices[i + 1].Position, t);
                         Leaf interpolatedLeaf = new Leaf(i, interpolatedPosition, Mathf.Lerp(branch.StartGlobalGrowthFactors[i], branch.StartGlobalGrowthFactors[i+1], t));
                         interpolatedLeaf.GrowthDirection = branch.Vertices[i + 1].Position - branch.Vertices[i].Position;
+
+
+                        interpolatedLeaf.UpSide = up;
+                        up = !up; // Flip side for next leaf
 
                         leaves.Add(interpolatedLeaf);
                     }
@@ -79,6 +89,10 @@ public class LeafUtils
                         }
                         leaf.GrowthDirection = branchDirection;
 
+
+                        leaf.UpSide = up;
+                        up = !up; // Flip side for next leaf
+                        
                         leaves.Add(leaf);
 
                         // If the distance between two vertices is greater than the threshold, interpolate between them
@@ -90,6 +104,10 @@ public class LeafUtils
                             Vector3 interpolatedPosition = Vector3.Lerp(subBranch.Vertices[i].Position, subBranch.Vertices[i + 1].Position, t);
                             Leaf interpolatedLeaf = new Leaf(i, interpolatedPosition, Mathf.Lerp(subBranch.StartGlobalGrowthFactors[i], subBranch.StartGlobalGrowthFactors[i+1], t));
                             interpolatedLeaf.GrowthDirection = branch.Vertices[i + 1].Position - branch.Vertices[i].Position;
+                            
+                            
+                            interpolatedLeaf.UpSide = up;
+                            up = !up; // Flip side for next leaf
                             leaves.Add(interpolatedLeaf);
                         }
 

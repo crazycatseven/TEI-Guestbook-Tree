@@ -313,7 +313,6 @@ public class TreeFromSkeleton : MonoBehaviour
 
             // Create leaves mesh
             // MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber, leafPrefab);
-            Debug.Log("before Create");
             MeshGenerator.CreateLeavesMesh(transform, leaves, growthFactor, leavesNumber);
 
             // Find the leaf object

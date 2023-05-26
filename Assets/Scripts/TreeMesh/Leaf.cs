@@ -9,7 +9,9 @@ public class Leaf
     public Vector3 GrowthDirection { get; set;}
     public float StartGlobalGrowthFactor { get; set; }
     public float Scale { get; set; }
+    public float RadiusOffset { get; set; }
     public LeafData LeafData { get; set; }
+    public bool UpSide { get; set;}
 
 
 
@@ -20,7 +22,9 @@ public class Leaf
         GrowthDirection = Vector3.zero;
         StartGlobalGrowthFactor = startGlobalGrowthFactor;
         Scale = 0.5f;
+        RadiusOffset = 0.0f;
         LeafData = null;
+        UpSide = true;
     }
 
 

@@ -304,10 +304,17 @@ public class MeshGenerator
                 leafObject.transform.position = leaf.Position;
 
 
+                Debug.Log(leaf.UpSide);
 
+                leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection, leaf.UpSide ? Vector3.up : Vector3.down);
+                leafObject.transform.Rotate(0, 90, 0, Space.Self);
+                leafObject.transform.Rotate(0, 0, 45, Space.Self);
 
                 // leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection);
-                leafObject.transform.rotation = Quaternion.LookRotation(Vector3.up);
+                // leafObject.transform.Rotate(30, 0, 0);      
+
+
+
 
                 leafObject.transform.localScale = Vector3.one * leaf.Scale;
 
