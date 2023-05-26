@@ -196,8 +196,11 @@ public static class LeafDataUtils
         float controlPoint2X = controlPoints[1].x;
         float controlPoint2Y = controlPoints[1].y;
 
-        Vector2 controlPoint1 = new Vector2(controlPointY * leafHeight, controlPointX * leafHeight);
-        Vector2 controlPoint2 = new Vector2(controlPoint2Y * leafHeight, controlPoint2X * leafHeight);
+        // Vector2 controlPoint1 = new Vector2(controlPointY * leafHeight, controlPointX * leafHeight);
+        // Vector2 controlPoint2 = new Vector2(controlPoint2Y * leafHeight, controlPoint2X * leafHeight);
+
+        Vector2 controlPoint1 = new Vector2(controlPointY, controlPointX);
+        Vector2 controlPoint2 = new Vector2(controlPoint2Y, controlPoint2X);    
 
         float u = 1 - t;
         Vector2 point = u * u * u * Vector2.zero;

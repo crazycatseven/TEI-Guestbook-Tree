@@ -6,7 +6,7 @@ public class Leaf
 {
     public int Index { get; }
     public Vector3 Position { get; }
-    public Vector3 Normal { get; }
+    public Vector3 GrowthDirection { get; set;}
     public float StartGlobalGrowthFactor { get; set; }
     public float Scale { get; set; }
     public LeafData LeafData { get; set; }
@@ -17,7 +17,7 @@ public class Leaf
     {
         Index = index;
         Position = position;
-        Normal = Vector3.zero;
+        GrowthDirection = Vector3.zero;
         StartGlobalGrowthFactor = startGlobalGrowthFactor;
         Scale = 0.5f;
         LeafData = null;
@@ -26,7 +26,7 @@ public class Leaf
 
     public override string ToString()
     {
-        return $"Index: {Index}, Position: {Position}, Normal: {Normal}, StartGlobalGrowthFactor: {StartGlobalGrowthFactor}";
+        return $"Index: {Index}, Position: {Position}, GrowthDirection: {GrowthDirection}, StartGlobalGrowthFactor: {StartGlobalGrowthFactor}";
     }
 
 }
