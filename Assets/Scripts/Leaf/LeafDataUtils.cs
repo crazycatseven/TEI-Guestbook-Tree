@@ -39,7 +39,7 @@ public static class LeafDataUtils
             }
         }
 
-        // 如果找不到对应行数的 LeafData，则返回 null 或者抛出异常，具体根据需求决定
+        // Return null if the targetID is invalid
         return null;
     }
 
@@ -47,7 +47,7 @@ public static class LeafDataUtils
     public static int GetLeafDataCount(string path)
     {
         string[] lines = File.ReadAllLines(path);
-        return lines.Length - 1; // 减去头部行
+        return lines.Length - 1; // Minus 1 to exclude the header line
     }
 
 
@@ -57,7 +57,7 @@ public static class LeafDataUtils
 
         string[] lines = File.ReadAllLines(path);
 
-        for (int i = 1; i < lines.Length; i++) // 从第二行开始，跳过头部行
+        for (int i = 1; i < lines.Length; i++) // Start from 1 to skip the header line
         {
             string[] values = lines[i].Split(',');
 
@@ -108,40 +108,12 @@ public static class LeafDataUtils
 
         for (int i = 0; i < resolution; i++)
         {
-
-            
-
             float t = i / (float)resolution;
             Vector2 point = BezierCurve(t, controlPoints, leafHeight);
             float next_t = (i + 1) / (float)resolution;
             Vector2 next_point = BezierCurve(next_t, controlPoints, leafHeight);
 
             float realLeafThickness = leafThickness /10;
-
-            // // Front face vertices
-            // vertices[i * 16] = new Vector3(point.x, point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 1] = new Vector3(point.x, -point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 2] = new Vector3(next_point.x, next_point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 3] = new Vector3(next_point.x, -next_point.y, -realLeafThickness / 2);
-
-            // // Back face vertices
-            // vertices[i * 16 + 4] = new Vector3(point.x, point.y, realLeafThickness / 2);
-            // vertices[i * 16 + 5] = new Vector3(point.x, -point.y, realLeafThickness / 2);
-            // vertices[i * 16 + 6] = new Vector3(next_point.x, next_point.y, realLeafThickness / 2);
-            // vertices[i * 16 + 7] = new Vector3(next_point.x, -next_point.y, realLeafThickness / 2);
-
-            // // Upper edge vertices
-            // vertices[i * 16 + 8] = new Vector3(point.x, point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 9] = new Vector3(next_point.x, next_point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 10] = new Vector3(point.x, point.y, realLeafThickness / 2);
-            // vertices[i * 16 + 11] = new Vector3(next_point.x, next_point.y, realLeafThickness / 2);
-
-            // // Lower edge vertices
-            // vertices[i * 16 + 12] = new Vector3(point.x, -point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 13] = new Vector3(next_point.x, -next_point.y, -realLeafThickness / 2);
-            // vertices[i * 16 + 14] = new Vector3(point.x, -point.y, realLeafThickness / 2);
-            // vertices[i * 16 + 15] = new Vector3(next_point.x, -next_point.y, realLeafThickness / 2);
-
 
             // Front face vertices
             vertices[i * 16] = new Vector3(point.y, point.x, -realLeafThickness / 2);
@@ -166,8 +138,6 @@ public static class LeafDataUtils
             vertices[i * 16 + 13] = new Vector3(-next_point.y, next_point.x, -realLeafThickness / 2);
             vertices[i * 16 + 14] = new Vector3(-point.y, point.x, realLeafThickness / 2);
             vertices[i * 16 + 15] = new Vector3(-next_point.y, next_point.x, realLeafThickness / 2);
-
-
 
             // Front face triangles
             triangles[i * 24] = i * 16 + 1;
@@ -221,9 +191,6 @@ public static class LeafDataUtils
         float controlPoint2X = controlPoints[1].x;
         float controlPoint2Y = controlPoints[1].y;
 
-        // Vector2 controlPoint1 = new Vector2(controlPointY * leafHeight, controlPointX * leafHeight);
-        // Vector2 controlPoint2 = new Vector2(controlPoint2Y * leafHeight, controlPoint2X * leafHeight);
-
         Vector2 controlPoint1 = new Vector2(controlPointY, controlPointX);
         Vector2 controlPoint2 = new Vector2(controlPoint2Y, controlPoint2X);    
 
@@ -234,7 +201,6 @@ public static class LeafDataUtils
         point += t * t * t * new Vector2(leafHeight, 0);
         return point;
     }
-
 
 }
 
