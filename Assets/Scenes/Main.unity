@@ -1679,11 +1679,11 @@ MonoBehaviour:
   controlPoint2X: 0.25
   controlPoint2Y: 0.7
   leafHeight: 1
-  leafThickness: 0.5
+  leafThickness: 0.25
   resolution: 100
-  leafHue: 0.3
-  leafSaturation: 0.8
-  leafBrightness: 1
+  leafHue: 0.26
+  leafSaturation: 0.75
+  leafBrightness: 0.7
 --- !u!114 &634975695
 MonoBehaviour:
   m_ObjectHideFlags: 0

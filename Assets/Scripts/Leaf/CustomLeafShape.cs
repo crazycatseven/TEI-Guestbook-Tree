@@ -25,19 +25,19 @@ public class CustomLeafShape : MonoBehaviour
     public float leafHeight = 1f;
 
     [Range(0, 1f)]
-    public float leafThickness = 0.5f;
+    public float leafThickness = 0.25f;
 
     [Range(1, 100)]
     public int resolution = 10;
 
     [Range(0, 1)]
-    public float leafHue = 0.3f; // 绿色的色相约为0.3
+    public float leafHue = 0.26f; // 绿色的色相约为0.3
 
     [Range(0, 1)]
-    public float leafSaturation = 0.8f; // 绿色的饱和度约为0.8
+    public float leafSaturation = 0.75f; // 绿色的饱和度约为0.8
 
     [Range(0, 1)]
-    public float leafBrightness = 1f; // 明度默认为1
+    public float leafBrightness = 0.7f; // 明度默认为1
 
 
     private Color leafColor;
@@ -123,7 +123,12 @@ public class CustomLeafShape : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         Vector3[] vertices = new Vector3[resolution * 16];
+        Vector2[] uv = new Vector2[resolution * 16];
         int[] triangles = new int[resolution * 24];
+
+
+        // 计算叶子中心位置
+        Vector2 centerPoint = BezierCurve(0.5f);
 
         for (int i = 0; i < resolution; i++)
         {
@@ -132,7 +137,13 @@ public class CustomLeafShape : MonoBehaviour
             float next_t = (i + 1) / (float)resolution;
             Vector2 next_point = BezierCurve(next_t);
 
-            float realLeafThickness = leafThickness /10;
+            // 计算当前顶点与叶子中心的距离
+            float distanceFromCenter = Vector2.Distance(point, centerPoint);
+
+            // 根据距离调整叶子厚度
+
+            float realLeafThickness = leafThickness * leafHeight * Mathf.Lerp(0.1f, 1f, (1 - Mathf.Abs(point.x) / leafHeight )) / 10;
+
 
             // Front face vertices
             vertices[i * 16] = new Vector3(point.y, point.x, -realLeafThickness / 2);
@@ -157,6 +168,31 @@ public class CustomLeafShape : MonoBehaviour
             vertices[i * 16 + 13] = new Vector3(-next_point.y, next_point.x, -realLeafThickness / 2);
             vertices[i * 16 + 14] = new Vector3(-point.y, point.x, realLeafThickness / 2);
             vertices[i * 16 + 15] = new Vector3(-next_point.y, next_point.x, realLeafThickness / 2);
+
+            // Front face UV
+            uv[i * 16] = new Vector2(0, t);                  // Bottom left
+            uv[i * 16 + 1] = new Vector2(1, t);              // Bottom right
+            uv[i * 16 + 2] = new Vector2(0, t + 1.0f / (resolution - 1));  // Top left
+            uv[i * 16 + 3] = new Vector2(1, t + 1.0f / (resolution - 1));  // Top right
+
+            // Back face UV
+            uv[i * 16 + 4] = new Vector2(0, t);              // Bottom left
+            uv[i * 16 + 5] = new Vector2(1, t);              // Bottom right
+            uv[i * 16 + 6] = new Vector2(0, t + 1.0f / (resolution - 1));  // Top left
+            uv[i * 16 + 7] = new Vector2(1, t + 1.0f / (resolution - 1));  // Top right
+
+
+            // Upper edge UV
+            uv[i * 16 + 8] = new Vector2(0.5f, t);           // Bottom
+            uv[i * 16 + 9] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top
+            uv[i * 16 + 10] = new Vector2(0.5f, t);          // Bottom (same as bottom left)
+            uv[i * 16 + 11] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top (same as top left)
+
+            // Lower edge UV
+            uv[i * 16 + 12] = new Vector2(0.5f, t);          // Bottom
+            uv[i * 16 + 13] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top
+            uv[i * 16 + 14] = new Vector2(0.5f, t);          // Bottom (same as bottom left)
+            uv[i * 16 + 15] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top (same as top left)
 
 
             // Front face triangles
@@ -197,6 +233,7 @@ public class CustomLeafShape : MonoBehaviour
         }
 
         mesh.vertices = vertices;
+        mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
     }

@@ -104,6 +104,7 @@ public static class LeafDataUtils
 
 
         Vector3[] vertices = new Vector3[resolution * 16];
+        Vector2[] uv = new Vector2[resolution * 16];
         int[] triangles = new int[resolution * 24];
 
         for (int i = 0; i < resolution; i++)
@@ -138,6 +139,28 @@ public static class LeafDataUtils
             vertices[i * 16 + 13] = new Vector3(-next_point.y, next_point.x, -realLeafThickness / 2);
             vertices[i * 16 + 14] = new Vector3(-point.y, point.x, realLeafThickness / 2);
             vertices[i * 16 + 15] = new Vector3(-next_point.y, next_point.x, realLeafThickness / 2);
+
+
+            // // UV coordinates
+            // uv[i * 16] = new Vector2(0, 0);                  // Front face bottom left
+            // uv[i * 16 + 1] = new Vector2(1, 0);              // Front face bottom right
+            // uv[i * 16 + 2] = new Vector2(0, 1);              // Front face top left
+            // uv[i * 16 + 3] = new Vector2(1, 1);              // Front face top right
+
+            // uv[i * 16 + 4] = new Vector2(0, 0);              // Back face bottom left
+            // uv[i * 16 + 5] = new Vector2(1, 0);              // Back face bottom right
+            // uv[i * 16 + 6] = new Vector2(0, 1);              // Back face top left
+            // uv[i * 16 + 7] = new Vector2(1, 1);              // Back face top right
+
+            // uv[i * 16 + 8] = new Vector2(0.5f, 0);           // Upper edge bottom
+            // uv[i * 16 + 9] = new Vector2(0.5f, 1);           // Upper edge top
+            // uv[i * 16 + 10] = new Vector2(0.5f, 0);          // Upper edge bottom (same as bottom left)
+            // uv[i * 16 + 11] = new Vector2(0.5f, 1);          // Upper edge top (same as top left)
+
+            // uv[i * 16 + 12] = new Vector2(0.5f, 0);          // Lower edge bottom
+            // uv[i * 16 + 13] = new Vector2(0.5f, 1);          // Lower edge top
+            // uv[i * 16 + 14] = new Vector2(0.5f, 0);          // Lower edge bottom (same as bottom left)
+            // uv[i * 16 + 15] = new Vector2(0.5f, 1);          // Lower edge top (same as top left)
 
             // Front face triangles
             triangles[i * 24] = i * 16 + 1;
@@ -177,6 +200,7 @@ public static class LeafDataUtils
         }
 
         mesh.vertices = vertices;
+        mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
 

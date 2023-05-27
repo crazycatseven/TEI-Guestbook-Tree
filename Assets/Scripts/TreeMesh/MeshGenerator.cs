@@ -262,13 +262,13 @@ public class MeshGenerator
 
                 meshRenderer.material = material;
 
-                Color leafColor = Color.HSVToRGB(leaf.LeafData.leafHue, leaf.LeafData.leafSaturation, leaf.LeafData.leafBrightness);
+                // Color leafColor = Color.HSVToRGB(leaf.LeafData.leafHue, leaf.LeafData.leafSaturation, leaf.LeafData.leafBrightness);
 
-                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+                // MaterialPropertyBlock mpb = new MaterialPropertyBlock();
 
-                mpb.SetColor("_Color", leafColor);
+                // mpb.SetColor("_Color", leafColor);
 
-                meshRenderer.SetPropertyBlock(mpb);                
+                // meshRenderer.SetPropertyBlock(mpb);                
 
                 leafObject.transform.position = leaf.Position;
 
@@ -291,9 +291,6 @@ public class MeshGenerator
 
                 // leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection);
                 // leafObject.transform.Rotate(30, 0, 0);      
-
-
-
 
                 leafObject.transform.localScale = Vector3.one * leaf.Scale;
 
