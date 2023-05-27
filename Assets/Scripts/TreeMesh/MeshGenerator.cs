@@ -218,37 +218,6 @@ public class MeshGenerator
         return combinedMesh;
     }
 
-    // public static Mesh CreateLeavesMesh(List<Leaf> leaves, float growthFactor, int leafNumber, GameObject leafPrefab)
-    // {
-    //     Mesh combinedMesh = new Mesh();
-    //     List<CombineInstance> combineInstances = new List<CombineInstance>();
-
-
-    //     for (int i = 0; i < Mathf.Min(leafNumber, leaves.Count); i++)
-    //     {
-    //         Leaf leaf = leaves[i];
-
-    //         if (leaf.StartGlobalGrowthFactor <= growthFactor)
-    //         {
-    //             // Instantiate the leaf prefab and get its MeshFilter's mesh
-    //             GameObject leafObject = GameObject.Instantiate(leafPrefab);
-    //             Mesh leafMesh = leafObject.GetComponent<MeshFilter>().sharedMesh;
-    //             GameObject.Destroy(leafObject);
-
-    //             Matrix4x4 transformMatrix = Matrix4x4.TRS(leaf.Position, Quaternion.identity, Vector3.one);
-
-    //             CombineInstance combineInstance = new CombineInstance { mesh = leafMesh, transform = transformMatrix };
-
-    //             combineInstances.Add(combineInstance);
-    //         }
-    //     }
-
-
-    //     combinedMesh.CombineMeshes(combineInstances.ToArray(), true, true);
-    //     combinedMesh.RecalculateNormals();
-
-    //     return combinedMesh;
-    // }
 
     public static Mesh CreateLeavesMesh(Transform parentTransform, List<Leaf> leaves, float growthFactor, int leafNumber)
     {
@@ -304,11 +273,21 @@ public class MeshGenerator
                 leafObject.transform.position = leaf.Position;
 
 
-                Debug.Log(leaf.UpSide);
-
                 leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection, leaf.UpSide ? Vector3.up : Vector3.down);
                 leafObject.transform.Rotate(0, 90, 0, Space.Self);
-                leafObject.transform.Rotate(0, 0, 45, Space.Self);
+
+                Vector3 offsetDirection = leafObject.transform.up;
+                float offsetAmount = leaf.BranchRadius * growthFactor;
+
+                if (!leaf.UpSide)
+                {
+                    offsetDirection *= -1;  // 如果 UpSide 为 false，则反转偏移方向
+                }
+
+                leafObject.transform.Translate(offsetDirection * offsetAmount, Space.Self);
+
+
+                // leafObject.transform.Rotate(0, 0, 45, Space.Self);
 
                 // leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection);
                 // leafObject.transform.Rotate(30, 0, 0);      
