@@ -31,8 +31,8 @@ public class LeafUtils
 
     private static void GenerateLeaves(Branch branch, List<Leaf> leaves, ref bool up)
     {
-        Vector3 branchUp = Vector3.forward;  // 假设分支的上方向为世界空间的正上方向
-
+        Vector3 branchUp = Vector3.forward;  // Assue the branch is growing along the Z axis
+        
         for (int i = 0; i < branch.Vertices.Count; i++)
         {
             if (branch.Vertices[i].IsFork)

@@ -143,7 +143,7 @@ public class MeshGenerator
                 continue;
             }
 
-            // 根据 SelfGrowthFactor 裁剪顶点列表
+            // Get actual vertex count
             int actualVertexCount = 0;
             for (int i = 0; i < branch.Vertices.Count; i++)
             {
@@ -157,13 +157,13 @@ public class MeshGenerator
                 }
             }
 
-            // 插值系数
+            // Interpolation factor
             float t = 0;
 
-            // 从顶点列表中获取当前最新实际的顶点
+            // Get last vertex and next vertex
             lastVertex = branch.Vertices[actualVertexCount - 1];
 
-            // 从树枝顶点列表中获取下一个顶点，如果当前顶点是树枝顶点列表中的最后一个顶点，则下一个顶点为插值顶点
+            // If the last vertex is not the last vertex of the branch
             if (branch.LengthRatios[actualVertexCount - 1] < 1)
             {
                 nextVertex = branch.Vertices[actualVertexCount];
@@ -176,15 +176,15 @@ public class MeshGenerator
             }
 
 
-            // 调整顶点半径
+            // Update radius scale
             for (int i = 0; i < actualVertexCount; i++){
                 TreeVertex currentVertex = branch.Vertices[i];
-                // 顶点半径
+                
                 float radiusScale = Mathf.Lerp(branch.MinRadiusFactor, branch.MaxRadiusFactor, branch.SelfGrowthFactor);
                 currentVertex.RadiusScale = radiusScale;
             }
 
-            // 更新插值顶点
+            // Interpolate vertex
             if (t > 0){
                 Vector3 interpolatedPosition = Vector3.Lerp(lastVertex.Position, nextVertex.Position, t);
                 float interpolatedRadiusX = Mathf.Lerp(lastVertex.RadiusX, nextVertex.RadiusX, t) * lastVertex.RadiusScale;
@@ -199,10 +199,10 @@ public class MeshGenerator
             }
 
 
-            // 创建一个新的顶点列表，包含所需的顶点和插值顶点（如果有的话）
+            // Create a new list of vertices, which contains the actual vertices and the interpolated vertex
             List<TreeVertex> branchVerticesList = branch.Vertices.GetRange(0, actualVertexCount);
 
-            // 添加插值顶点到顶点列表
+            // Add the interpolated vertex to the list if it exists
             if (branch.InterpolatedVertex != null)
             {
                 branchVerticesList.Add(branch.InterpolatedVertex);
@@ -250,16 +250,18 @@ public class MeshGenerator
                 MeshFilter meshFilter = leafObject.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = leafObject.AddComponent<MeshRenderer>();
 
-                // 将Mesh赋值给MeshFilter
+                // Set mesh to leafMesh
                 meshFilter.mesh = leafMesh;
 
-                // 设置材质为Assets/Materials/Leaf
+                // Set material to leaf material
 
                 string materialPath = "Assets/Material/Leaf.mat";
 
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-                meshRenderer.material = material;          
+                meshRenderer.material = material;
+
+
 
                 leafObject.transform.position = leaf.Position;
 
@@ -272,12 +274,22 @@ public class MeshGenerator
 
                 if (!leaf.UpSide)
                 {
-                    offsetDirection *= -1;  // 如果 UpSide 为 false，则反转偏移方向
+                    offsetDirection *= -1;  // If the leaf is upside down, the offset direction should be reversed
                 }
 
                 leafObject.transform.Translate(offsetDirection * offsetAmount, Space.Self);
 
                 leafObject.transform.localScale = Vector3.one * leaf.Scale;
+
+                Color leafColor = Color.HSVToRGB(leaf.LeafData.leafHue, leaf.LeafData.leafSaturation, leaf.LeafData.leafBrightness);
+
+                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+
+                mpb.SetColor("_Color", leafColor);
+
+                meshRenderer.SetPropertyBlock(mpb);
+
+
 
 
 

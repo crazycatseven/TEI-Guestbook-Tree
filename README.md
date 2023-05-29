@@ -1,8 +1,15 @@
 # TEI-Guestbook-Tree
 
+## Project Poster
+
+![Project Poster](./Poster.jpg)
+
 ## Introduction
 
 Welcome to the project. For accessibility, I have modified the code to accept keyboard inputs. This change allows you to simulate Arduino input directly from your keyboard.
+
+To understand the details and specifics of this project, I recommend reading the [project report](./COMP3740_Report_Digital_E_Guestbook_with_Tangible_Embodied_Interfaces__An_Interactive_Tree_Visualization_for_Public_Spaces.pdf) which provides an in-depth analysis and explanation of the project.
+
 
 ## Prototype Demo
 

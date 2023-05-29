@@ -59,11 +59,20 @@ public class LeafKeyEvent : MonoBehaviour
                 // 使用小键盘上的数字键0
                 key = KeyCode.Keypad0;
             }
+            
 
             if (Input.GetKey(key))
             {
                 IncrementValue(i);
             }
+
+            // 同时处理小键盘上的数字键
+            KeyCode numpadKey = KeyCode.Keypad1 + i;
+            if (Input.GetKey(numpadKey))
+            {
+                IncrementValue(i);
+            }
+
             // KeyCode key = KeyCode.Keypad1 + i; // 对应小键盘的数字键
             // if (Input.GetKey(key))
             // {

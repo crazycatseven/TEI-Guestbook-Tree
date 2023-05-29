@@ -107,7 +107,7 @@ public static class LeafDataUtils
         Vector2[] uv = new Vector2[resolution * 16];
         int[] triangles = new int[resolution * 24];
 
-        // 计算叶子中心位置
+
         Vector2 centerPoint = BezierCurve(0.5f, controlPoints, leafHeight);
 
         for (int i = 0; i < resolution; i++)
@@ -117,11 +117,10 @@ public static class LeafDataUtils
             float next_t = (i + 1) / (float)resolution;
             Vector2 next_point = BezierCurve(next_t, controlPoints, leafHeight);
 
-            // 计算当前顶点与叶子中心的距离
+            // Calculate the distance from the center point
             float distanceFromCenter = Vector2.Distance(point, centerPoint);
 
-            // 根据距离调整叶子厚度
-
+            // Calculate the thickness of the leaf at the current point
             float realLeafThickness = leafThickness * leafHeight * Mathf.Lerp(0.1f, 1f, (1 - Mathf.Abs(point.x) / leafHeight )) / 10;
 
 

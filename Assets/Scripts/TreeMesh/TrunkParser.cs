@@ -26,7 +26,7 @@ public class TrunkParser
 
                     if (trunkFound && line.Trim().StartsWith("Vertex:"))
                     {
-                        // 使用正则表达式解析顶点数据
+                        // Use regex to parse the vertex data
                         Match vertexMatch = Regex.Match(line, @"Vertex: (\d+), Position: <Vector \((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\)>, Normal: <Vector \((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\)>, RadiusX: (-?\d+\.\d+), RadiusY: (-?\d+\.\d+)");
 
                         if (vertexMatch.Success)

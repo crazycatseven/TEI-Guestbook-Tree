@@ -69,7 +69,7 @@ public class CameraController : MonoBehaviour
                 {
                     yield return new WaitForSeconds(delay);
                 }
-                yield return StartCoroutine(MoveCamera(returnPos, 0.02f));
+                yield return StartCoroutine(MoveCamera(returnPos, 0.1f));
 
             }
 

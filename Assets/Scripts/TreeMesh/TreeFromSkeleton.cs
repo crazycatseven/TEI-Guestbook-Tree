@@ -50,9 +50,12 @@ public class TreeFromSkeleton : MonoBehaviour
 
     private bool autoGrow = false;
 
+    public CustomLeafShape customLeafShape;
+
     #region UI
     public Canvas canvas;
     public GameObject customLeafCreatorCanvas;
+    public GameObject customLeafCreatorCanvas2;
     private Text growthFactorText;
     private Text leavesNumberText;
     private Text leavesAvailableText;
@@ -70,7 +73,16 @@ public class TreeFromSkeleton : MonoBehaviour
         #region UI Event
         Transform panel = canvas.transform.Find("Panel");
         customLeafCreatorCanvas = GameObject.Find("CustomLeafCreator");
+        customLeafCreatorCanvas2 = GameObject.Find("CanvasLeafCreator2");
         customLeafCreatorCanvas.SetActive(false);
+        customLeafCreatorCanvas2.SetActive(false);
+
+
+        Transform leafObjectTransform = customLeafCreatorCanvas.transform.Find("LeafObject");
+        if (leafObjectTransform != null) // Make sure the child was found
+        {
+            customLeafShape = leafObjectTransform.GetComponent<CustomLeafShape>();
+        }
         
         // Text
         growthFactorText = panel.Find("GrowthFactorText").GetComponent<Text>();
@@ -86,23 +98,24 @@ public class TreeFromSkeleton : MonoBehaviour
         #endregion
 
 
-        // 1. 解析树干和树枝的顶点
+        // 1. Parse the tree skeleton file
         trunkVertices = TrunkParser.ParseTrunkVertices(trunkFilePath);
         branches = BranchParser.ParseBranches(trunkFilePath, 1);
         subBranches = BranchParser.ParseBranches(trunkFilePath, 2);
-    
-        // 1.1 在树干顶点组最后添加一个顶点，作为预留的插值顶点
+
+                
+        // 1.1 Add an empty vertex to the trunkVertices list
         TreeVertex emptyVertex = new TreeVertex(-1, Vector3.zero, Vector3.zero, 0, 0);
         trunkVertices.Add(emptyVertex);
 
-        // 1.2 计算树干的总长度
+        // 1.2 Calculate the total length of the trunk
         trunkTotalLength = 0;
         for (int i = 0; i < trunkVertices.Count - 2; i++)
         {
             trunkTotalLength += Vector3.Distance(trunkVertices[i].Position, trunkVertices[i + 1].Position);
         }
 
-        // 1.3 设置每一个顶点的长度比例
+        // 1.3 Set the length ratio of each trunk vertex
 
         trunkVerticesLengthRatios = new float[trunkVertices.Count];
         float currentLength = 0;
@@ -115,34 +128,27 @@ public class TreeFromSkeleton : MonoBehaviour
         }
 
 
-        // 1.4 设置树枝的长度比例
+        // 1.4 Set the length ratio
         foreach (Branch branch in branches)
         {
-            // 计算树枝的总长度
+            // Calculate the total length of the branch
             float branchTotalLength = 0;
             for (int i = 0; i < branch.Vertices.Count - 1; i++)
             {
                 branchTotalLength += Vector3.Distance(branch.Vertices[i].Position, branch.Vertices[i + 1].Position);
             }
 
-            // 设置树枝的长度比例与起始生长因子组
+            // Set the length ratio of each branch vertex
             branch.LengthRatios = new float[branch.Vertices.Count];
             branch.StartGlobalGrowthFactors = new float[branch.Vertices.Count];
 
-            // 寻找起始顶点的index
-            int startVertexIndex = branch.Vertices[0].Index;
-
-            if (trunkVertices.Find(vertex => vertex.Index == startVertexIndex) == null)
-            {
-                // Reverse branch vertices
-                branch.Vertices.Reverse();
-                startVertexIndex = branch.Vertices[0].Index;
-            }
-
-            // 把起始点设置为分叉点
+            // Set the first vertex of the branch as a fork
             branch.Vertices[0].IsFork = true;
 
-            // 在树干顶点组中找到起始顶点
+            // Set the first vertex of the branch as the start vertex
+            int startVertexIndex = branch.Vertices[0].Index;
+
+            // Set the start vertex's global growth factor
             float startVertexLengthRatio = trunkVertices.Find(vertex => vertex.Index == startVertexIndex).LengthRatio;
             
             currentLength = 0;
@@ -161,16 +167,16 @@ public class TreeFromSkeleton : MonoBehaviour
                 branch.StartGlobalGrowthFactors[i] = startVertexLengthRatio + branch.LengthRatios[i] * (1 - startVertexLengthRatio);
             }
 
-            // 设置树枝的最小半径和最大半径
+            // Set the branch's min and max radius factor
             branch.MinRadiusFactor = branchMinRadiusFactor;
             branch.MaxRadiusFactor = branchMaxRadiusFactor;
 
         }
 
-        // 1.5 设置子树枝的长度比例
+        // 1.5 Set the length ratio
         foreach (Branch branch in subBranches)
         {
-            // 计算树枝的总长度
+            // Calculate the total length of the branch
             float branchTotalLength = 0;
             for (int i = 0; i < branch.Vertices.Count - 1; i++)
             {
@@ -195,18 +201,18 @@ public class TreeFromSkeleton : MonoBehaviour
                 }
             }
 
-            // 设置树枝的最小半径和最大半径
+            // Set the branch's min and max radius factor
             branch.MinRadiusFactor = branchMinRadiusFactor;
             branch.MaxRadiusFactor = branchMaxRadiusFactor;
         }
 
 
-        // 1.6 把子树枝添加到树枝的子树枝列表中
+        // 1.6 Set the subBranches to the branches
         foreach (Branch branch in branches)
         {
             foreach (Branch subBranch in subBranches)
             {
-                // 如果子树枝的起始顶点在树枝的定点组中，则把子树枝添加到树枝的子树枝列表中
+                // If the subBranch's first vertex is the same as the branch's vertex, then add the subBranch to the branch
 
                 for (int i = 0; i < branch.Vertices.Count; i++)
                 {
@@ -226,37 +232,18 @@ public class TreeFromSkeleton : MonoBehaviour
                         }
                         break;
                     }
-
-                    if (subBranch.Vertices[subBranch.Vertices.Count - 1].Index == branch.Vertices[i].Index)
-                    {
-                        subBranch.Vertices.Reverse();
-                        subBranch.Vertices[0].IsFork = true;
-                        branch.Vertices[i].IsFork = true;
-
-
-                        branch.SubBranches.Add(subBranch);
-
-                        subBranch.StartGlobalGrowthFactors = new float[subBranch.Vertices.Count];
-                        for (int j = 0; j < subBranch.Vertices.Count; j++)
-                        {
-                            subBranch.StartGlobalGrowthFactors[j] = branch.StartGlobalGrowthFactors[i] 
-                                + subBranch.LengthRatios[j] * (1 - branch.StartGlobalGrowthFactors[i]);
-                        }
-                        break;
-                    }
-
                 }
             }
         }
         
-        // 2. 使用解析出的顶点创建树干网格
+        // 2. Generate the trunk mesh and branches mesh
         Mesh trunkMesh = MeshGenerator.CreateTrunkMesh(trunkVertices, radialSegments, trunkVertices.Count - 1);
         Mesh branchesMesh = MeshGenerator.CreateBranchesMesh(branches, radialSegments);
 
         Mesh combinedMesh = CombineMeshes(trunkMesh, branchesMesh);
 
 
-        // 3. 将生成的树干网格赋给 MeshFilter 组件
+        // 3. Add MeshFilter to the trunk
         meshFilter = GetComponent<MeshFilter>();
 
         if (meshFilter == null)
@@ -265,7 +252,7 @@ public class TreeFromSkeleton : MonoBehaviour
         }
         meshFilter.mesh = combinedMesh;
 
-        // 4. 为树干添加 MeshRenderer
+        // 4. Add MeshRenderer to the trunk
         meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer == null)
         {
@@ -275,7 +262,7 @@ public class TreeFromSkeleton : MonoBehaviour
 
 
 
-        // 5. 获得所有树叶
+        // 5. Generate the leaves
         leaves = LeafUtils.GetLeaves(branches);
 
         treeUpdated = true;
@@ -339,7 +326,7 @@ public class TreeFromSkeleton : MonoBehaviour
             return;
         }
 
-        // 根据 growthFactor 和 trunkVerticesLengthRatios 计算实际的顶点数量
+        // Calculate the actual vertex count based on the growth factor and the trunk vertices length ratios
         actualVertexCount = 0;
         for (int i = 0; i < trunkVerticesLengthRatios.Length - 1; i++)
         {
@@ -354,10 +341,10 @@ public class TreeFromSkeleton : MonoBehaviour
         }
     
 
-        // 从树干顶点组中获取当前最新实际的顶点
+        // Get the last vertex and the next vertex
         lastVertex = trunkVertices[actualVertexCount-1];
 
-        // 从树干顶点组中获取下一个顶点, 如果当前顶点的长度比例为 1，则下一个顶点为当前顶点
+        // If the last vertex is the last vertex of the trunk, then the next vertex is the last vertex
         if (lastVertex.LengthRatio < 1)
         {
             nextVertex = trunkVertices[actualVertexCount];
@@ -374,7 +361,7 @@ public class TreeFromSkeleton : MonoBehaviour
             vertex.RadiusScale = radiusFactor;
         }
 
-        // 计算插值后的位置
+        // Calculate the interpolated position and radius of the last vertex
         float t = (growthFactor - lastVertex.LengthRatio) / (nextVertex.LengthRatio - lastVertex.LengthRatio);
 
 
@@ -383,7 +370,7 @@ public class TreeFromSkeleton : MonoBehaviour
 
         float interpolatedRadiusX = Mathf.Lerp(lastVertex.RadiusX, nextVertex.RadiusX, t) * lastVertex.RadiusScale;
 
-        // 更新插值顶点(最后一个顶点)
+        // Update the last vertex 
         trunkVertices[trunkVertices.Count - 1] = new TreeVertex(
             nextVertex.Index,
             interpolatedPosition,
@@ -391,9 +378,6 @@ public class TreeFromSkeleton : MonoBehaviour
             interpolatedRadiusX,
             interpolatedRadiusX
         );
-
-
-        // Debug.Log("lastVertex: " + lastVertex.Position + ", nextVertex: " + nextVertex.Position + ", interpolatedPosition: " + interpolatedPosition);
     }
 
 
@@ -403,17 +387,17 @@ public class TreeFromSkeleton : MonoBehaviour
         {
             Branch branch = branches[i];
 
-            // 设置树枝的最小半径和最大半径
+            // Set the min radius and max radius of the branch
             branch.MinRadiusFactor = branchMinRadiusFactor;
             branch.MaxRadiusFactor = branchMaxRadiusFactor;
 
-            // 在树干顶点组中找到起始顶点
+            // Find the start vertex index of the branch
             float startFromStartGlobalGrowthFactor = branch.StartGlobalGrowthFactors[0];
 
             if ( growthFactor >= startFromStartGlobalGrowthFactor)
             {
                 
-                // 计算树枝的 SelfGrowthFactor
+                // Calculate the self growth factor of the branch
                 branch.SelfGrowthFactor = (growthFactor - startFromStartGlobalGrowthFactor) / (1 - startFromStartGlobalGrowthFactor);
 
             }else{
@@ -425,16 +409,16 @@ public class TreeFromSkeleton : MonoBehaviour
             foreach (Branch subBranch in branch.SubBranches)
             {
 
-                           // 设置树枝的最小半径和最大半径
+                // Set the min radius and max radius of the sub branch
                 subBranch.MinRadiusFactor = branchMinRadiusFactor;
                 subBranch.MaxRadiusFactor = branchMaxRadiusFactor;
 
-                // 寻找子树枝的起始顶点的index
+                // Find the start vertex index of the sub branch
                 int subBranchStartVertexIndex = subBranch.Vertices[0].Index;
                 float subBranchStartVertexLengthRatio = -1.0f;
 
 
-                // 在树枝顶点组中找到子树枝的起始顶点
+                // Find the length ratio of the start vertex of the sub branch
                 for (int j = 0; j < branch.Vertices.Count; j++)
                 {
                     if (branch.Vertices[j].Index == subBranchStartVertexIndex)
@@ -446,7 +430,7 @@ public class TreeFromSkeleton : MonoBehaviour
 
                 if (branch.SelfGrowthFactor >= subBranchStartVertexLengthRatio)
                 {
-                    // 计算subBranch的 SelfGrowthFactor
+                    // Calculate the self growth factor of the sub branch
                     subBranch.SelfGrowthFactor = (branch.SelfGrowthFactor - subBranchStartVertexLengthRatio) / (1 - subBranchStartVertexLengthRatio);
                 }
                 else
@@ -459,7 +443,7 @@ public class TreeFromSkeleton : MonoBehaviour
     }
 
 
-    // 合并两个 Mesh 对象的方法
+    // Combine two meshes
     private Mesh CombineMeshes(Mesh mesh1, Mesh mesh2)
     {
         Mesh combinedMesh = new Mesh();
@@ -488,13 +472,16 @@ public class TreeFromSkeleton : MonoBehaviour
 
     public void AddLeafEvent()
     {
-        // 隐藏UI和当前的GameObject
+        // Disable CustomLeafCreatorCanvas
         canvas.enabled = false;
         gameObject.SetActive(false);
 
 
-        // 启用CustomLeafCreatorCanvas
+        // Enable CustomLeafCreatorCanvas
         customLeafCreatorCanvas.SetActive(true);
+        customLeafCreatorCanvas2.SetActive(true);
+        customLeafShape.ResetToDefault();
+
     }
 
     public void AddLeafEventContinue(LeafData data)
@@ -502,6 +489,7 @@ public class TreeFromSkeleton : MonoBehaviour
         canvas.enabled = true;
         gameObject.SetActive(true);
         customLeafCreatorCanvas.SetActive(false);
+        customLeafCreatorCanvas2.SetActive(false);
 
 
         if (leavesNumber == leaves.Count)
@@ -513,13 +501,17 @@ public class TreeFromSkeleton : MonoBehaviour
 
         leaves[leavesNumber].LeafData = data;
 
-        if (availableLeavesNumber > leavesNumber)
-        {
-            leavesNumber++;
-            treeUpdated = true;
-        }else{
-            nextCameraPosition = LeafUtils.GetNextAvailableLeafPosition(leaves, growthFactor);
-            autoGrow = true;
-        }
+        nextCameraPosition = LeafUtils.GetNextAvailableLeafPosition(leaves, growthFactor);
+        autoGrow = true;
+
+
+        // if (availableLeavesNumber > leavesNumber)
+        // {
+        //     leavesNumber++;
+        //     treeUpdated = true;
+        // }else{
+        //     nextCameraPosition = LeafUtils.GetNextAvailableLeafPosition(leaves, growthFactor);
+        //     autoGrow = true;
+        // }
     }
 }

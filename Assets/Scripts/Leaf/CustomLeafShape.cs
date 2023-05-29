@@ -31,13 +31,13 @@ public class CustomLeafShape : MonoBehaviour
     public int resolution = 10;
 
     [Range(0, 1)]
-    public float leafHue = 0.26f; // 绿色的色相约为0.3
+    public float leafHue = 0.26f; 
 
     [Range(0, 1)]
-    public float leafSaturation = 0.75f; // 绿色的饱和度约为0.8
+    public float leafSaturation = 0.75f; 
 
     [Range(0, 1)]
-    public float leafBrightness = 0.7f; // 明度默认为1
+    public float leafBrightness = 0.7f;
 
 
     private Color leafColor;
@@ -69,13 +69,13 @@ public class CustomLeafShape : MonoBehaviour
 
         leafColor = Color.HSVToRGB(leafHue, leafSaturation, leafBrightness);
 
-        // 创建一个新的材质属性块
+        // Create a new MaterialPropertyBlock
         mpb = new MaterialPropertyBlock();
         
-        // 设置颜色属性
-        mpb.SetColor("_Color", leafColor);  // 你想要的颜色
+        // Set color property
+        mpb.SetColor("_Color", leafColor); 
 
-        // 获取Renderer组件并应用材质属性块
+
         Renderer renderer = GetComponent<Renderer>();
         renderer.SetPropertyBlock(mpb);
     }
@@ -101,13 +101,13 @@ public class CustomLeafShape : MonoBehaviour
         {
             leafColor = Color.HSVToRGB(leafHue, leafSaturation, leafBrightness);
 
-            // 创建一个新的材质属性块
+            // Create a new MaterialPropertyBlock
             mpb = new MaterialPropertyBlock();
 
-            // 设置颜色属性
-            mpb.SetColor("_Color", leafColor);  // 你想要的颜色
+            // Set color property
+            mpb.SetColor("_Color", leafColor);  
 
-            // 获取Renderer组件并应用材质属性块
+
             Renderer renderer = GetComponent<Renderer>();
             renderer.SetPropertyBlock(mpb);
 
@@ -127,7 +127,6 @@ public class CustomLeafShape : MonoBehaviour
         int[] triangles = new int[resolution * 24];
 
 
-        // 计算叶子中心位置
         Vector2 centerPoint = BezierCurve(0.5f);
 
         for (int i = 0; i < resolution; i++)
@@ -137,10 +136,10 @@ public class CustomLeafShape : MonoBehaviour
             float next_t = (i + 1) / (float)resolution;
             Vector2 next_point = BezierCurve(next_t);
 
-            // 计算当前顶点与叶子中心的距离
+            // Calculate distance from center
             float distanceFromCenter = Vector2.Distance(point, centerPoint);
 
-            // 根据距离调整叶子厚度
+            // Adjust leaf thickness based on distance from center
 
             float realLeafThickness = leafThickness * leafHeight * Mathf.Lerp(0.1f, 1f, (1 - Mathf.Abs(point.x) / leafHeight )) / 10;
 
@@ -254,17 +253,17 @@ public class CustomLeafShape : MonoBehaviour
 
     public LeafData SaveLeafData(string path)
     {
-        int id = 1;  // 默认id为1
+        int id = 1;  // Default id
         if (File.Exists(path))
         {
-            string lastLine = File.ReadLines(path).Last();  // 读取文件的最后一行
-            if (!lastLine.StartsWith("id"))  // 如果最后一行不是头部行
+            string lastLine = File.ReadLines(path).Last();  // Get last line of file
+            if (!lastLine.StartsWith("id"))  // If last line is not the header
             {
                 string[] values = lastLine.Split(',');
-                id = int.Parse(values[0]) + 1;  // 获取最后一行的id并加一
+                id = int.Parse(values[0]) + 1;  // Get id from last line and increment it
             }
         }
-        else  // 如果文件不存在，需要添加一个头部行
+        else  // If file doesn't exist, create it and add header
         {
             string header = "id,controlPointX,controlPointY,controlPoint2X,controlPoint2Y,leafHeight,leafThickness,resolution,leafHue,leafSaturation,leafBrightness,creationDate";
             File.AppendAllText(path, header + Environment.NewLine);
@@ -287,9 +286,25 @@ public class CustomLeafShape : MonoBehaviour
         };
 
         string line = $"{data.id},{data.controlPointX},{data.controlPointY},{data.controlPoint2X},{data.controlPoint2Y},{data.leafHeight},{data.leafThickness},{data.resolution},{data.leafHue},{data.leafSaturation},{data.leafBrightness},{data.creationDate}";
-        File.AppendAllText(path, line + Environment.NewLine);  // 在文件末尾添加新的数据行
+        File.AppendAllText(path, line + Environment.NewLine);  // Append line to file
 
         return data;
+    }
+
+    public void ResetToDefault()
+    {
+        controlPointX = 0.4f;
+        controlPointY = 0.1f;
+        controlPoint2X = 0.25f;
+        controlPoint2Y = 0.7f;
+        leafHeight = 1f;
+        leafThickness = 0.25f;
+        resolution = 10;
+        leafHue = 0.26f;
+        leafSaturation = 0.75f;
+        leafBrightness = 0.7f;
+
+        Start();
     }
 
 }

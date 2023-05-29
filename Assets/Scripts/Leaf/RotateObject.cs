@@ -2,48 +2,48 @@ using UnityEngine;
 
 public class RotateObject : MonoBehaviour
 {
-    public float rotationSpeed = 72f;  // 每秒旋转的角度数
-    private bool rotationEnabled = true; // 新增变量，控制是否允许旋转
+    public float rotationSpeed = 72f;  // Rotation speed in degrees per second
+    private bool rotationEnabled = true; // Whether the rotation is enabled
 
     private void Update()
     {
-        // 按下小键盘上的0键，切换旋转开关
+        // Press the 0 key to toggle rotation
         if (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetKeyDown(KeyCode.Alpha0))
         {
             rotationEnabled = !rotationEnabled;
         }
 
-        // 按下左方向键，手动向左旋转
+        // Press the left arrow key to manually rotate left
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             RotateLeft();
         }
 
-        // 按下右方向键，手动向右旋转
+        // Press the right arrow key to manually rotate right
         if (Input.GetKey(KeyCode.RightArrow))
         {
             RotateRight();
         }
 
-        // 当旋转开关打开时，自动旋转
+        // Rotate the object if rotation is enabled
         if (rotationEnabled)
         {
-            // 计算这一帧需要旋转的角度
+            // Calculate the rotation angle
             float angle = rotationSpeed * Time.deltaTime;
 
-            // 在Y轴上旋转物体
+            // Rotate the object around the y axis
             transform.Rotate(0, angle, 0);
         }
     }
 
-    // 左旋转函数
+    // Left rotation function
     private void RotateLeft()
     {
         float angle = rotationSpeed * Time.deltaTime;
-        transform.Rotate(0, -angle, 0); // 注意这里的旋转角度是负值，表示向左旋转
+        transform.Rotate(0, -angle, 0); // Negative angle for left rotation
     }
 
-    // 右旋转函数
+    // Right rotation function
     private void RotateRight()
     {
         float angle = rotationSpeed * Time.deltaTime;

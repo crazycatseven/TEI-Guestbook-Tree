@@ -20,7 +20,7 @@ public class Leaf
         Position = position;
         GrowthDirection = Vector3.zero;
         StartGlobalGrowthFactor = startGlobalGrowthFactor;
-        Scale = 0.2f;
+        Scale = 0.3f;
         BranchRadius = branchRadius;
         LeafData = null;
         UpSide = true;

@@ -28,14 +28,14 @@ public class BranchParser
 
                 if (branchFound && line.Trim().StartsWith("Vertex Group"))
                 {
-                    currentBranch = new Branch(branchLevel);  // 重新初始化 currentBranch
+                    currentBranch = new Branch(branchLevel);  // Initialize a new branch
                     vertexGroupFound = true;
                     continue;
                 }
 
                 if (vertexGroupFound && line.Trim().StartsWith("Vertex:"))
                 {
-                    // 使用正则表达式解析顶点数据
+                    // Use regex to parse the vertex data
                     Match vertexMatch = Regex.Match(line, @"Vertex: (\d+), Position: <Vector \((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\)>, Normal: <Vector \((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\)>, RadiusX: (-?\d+\.\d+), RadiusY: (-?\d+\.\d+)");
 
                     if (vertexMatch.Success)
