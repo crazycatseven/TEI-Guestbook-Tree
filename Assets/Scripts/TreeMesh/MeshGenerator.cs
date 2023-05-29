@@ -81,6 +81,7 @@ public class MeshGenerator
                 triangles[triangleIndex + 4] = baseIndex + radialSegments + 1;
                 triangles[triangleIndex + 5] = baseIndex + radialSegments + 2;
             }
+            
         }
         else
         {
@@ -239,8 +240,6 @@ public class MeshGenerator
             GameObject leafObject = new GameObject("Leaf");
             leafObject.transform.SetParent(parentTransform);
 
-            Debug.Log(leaf.StartGlobalGrowthFactor + "  " + growthFactor);
-
             if (leaf.StartGlobalGrowthFactor <= growthFactor)
             {
 
@@ -260,15 +259,7 @@ public class MeshGenerator
 
                 Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-                meshRenderer.material = material;
-
-                // Color leafColor = Color.HSVToRGB(leaf.LeafData.leafHue, leaf.LeafData.leafSaturation, leaf.LeafData.leafBrightness);
-
-                // MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-
-                // mpb.SetColor("_Color", leafColor);
-
-                // meshRenderer.SetPropertyBlock(mpb);                
+                meshRenderer.material = material;          
 
                 leafObject.transform.position = leaf.Position;
 
@@ -286,12 +277,6 @@ public class MeshGenerator
 
                 leafObject.transform.Translate(offsetDirection * offsetAmount, Space.Self);
 
-
-                // leafObject.transform.Rotate(0, 0, 45, Space.Self);
-
-                // leafObject.transform.rotation = Quaternion.LookRotation(leaf.GrowthDirection);
-                // leafObject.transform.Rotate(30, 0, 0);      
-
                 leafObject.transform.localScale = Vector3.one * leaf.Scale;
 
 
@@ -301,51 +286,6 @@ public class MeshGenerator
 
         }
         return null;
-    }
-
-
-
-    public static Mesh CreateCubeMesh(float size = 1f)
-    {
-        Mesh cubeMesh = new Mesh();
-
-        Vector3[] vertices = new Vector3[8];
-        int[] triangles = new int[36];
-
-        float halfSize = size * 0.5f;
-
-        // Define vertices.
-        vertices[0] = new Vector3(-halfSize, -halfSize, -halfSize);
-        vertices[1] = new Vector3(-halfSize, -halfSize, halfSize);
-        vertices[2] = new Vector3(-halfSize, halfSize, halfSize);
-        vertices[3] = new Vector3(-halfSize, halfSize, -halfSize);
-        vertices[4] = new Vector3(halfSize, -halfSize, -halfSize);
-        vertices[5] = new Vector3(halfSize, -halfSize, halfSize);
-        vertices[6] = new Vector3(halfSize, halfSize, halfSize);
-        vertices[7] = new Vector3(halfSize, halfSize, -halfSize);
-
-        // Define triangles.
-        triangles = new int[] 
-        {
-            0, 2, 1, //front face
-            0, 3, 2,
-            2, 3, 6, //top face
-            3, 7, 6,
-            1, 2, 5, //right face
-            2, 6, 5,
-            0, 7, 3, //left face
-            0, 4, 7,
-            5, 6, 4, //back face
-            6, 7, 4,
-            0, 1, 4, //bottom face
-            1, 5, 4
-        };
-
-        cubeMesh.vertices = vertices;
-        cubeMesh.triangles = triangles;
-        cubeMesh.RecalculateNormals();
-
-        return cubeMesh;
     }
 
 }

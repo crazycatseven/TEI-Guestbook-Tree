@@ -1339,6 +1339,7 @@ GameObject:
   - component: {fileID: 477097392}
   - component: {fileID: 477097391}
   - component: {fileID: 477097390}
+  - component: {fileID: 477097394}
   m_Layer: 5
   m_Name: CustomLeafCreator
   m_TagString: Untagged
@@ -1429,6 +1430,28 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &477097394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477097389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c12d24274f7a90f41b24ef95ecd9442b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlPointX: 0.4
+  controlPointY: 0.1
+  controlPoint2X: 0.25
+  controlPoint2Y: 0.7
+  leafHeight: 1
+  leafThickness: 0.25
+  resolution: 10
+  leafHue: 0.26
+  leafSaturation: 0.75
+  leafBrightness: 0.7
 --- !u!4 &487208152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7398156219902357113, guid: 3af91f2e83bdad0438b53b72c0bda3be, type: 3}
@@ -1655,6 +1678,7 @@ GameObject:
   - component: {fileID: 634975696}
   - component: {fileID: 634975694}
   - component: {fileID: 634975695}
+  - component: {fileID: 634975699}
   m_Layer: 0
   m_Name: LeafObject
   m_TagString: Untagged
@@ -1671,19 +1695,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 634975693}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c12d24274f7a90f41b24ef95ecd9442b, type: 3}
+  m_Script: {fileID: 11500000, guid: 98f5e76bee13ff340b2c7e48f8781ffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlPointX: 0.4
-  controlPointY: 0.1
-  controlPoint2X: 0.25
-  controlPoint2Y: 0.7
-  leafHeight: 1
-  leafThickness: 0.25
-  resolution: 100
-  leafHue: 0.26
-  leafSaturation: 0.75
-  leafBrightness: 0.7
+  leafShape: {fileID: 0}
+  treeFromSkeleton: {fileID: 0}
 --- !u!114 &634975695
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1762,6 +1778,28 @@ Transform:
   m_Father: {fileID: 477097393}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &634975699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634975693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c12d24274f7a90f41b24ef95ecd9442b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlPointX: 0.4
+  controlPointY: 0.1
+  controlPoint2X: 0.25
+  controlPoint2Y: 0.7
+  leafHeight: 1
+  leafThickness: 0.25
+  resolution: 10
+  leafHue: 0.26
+  leafSaturation: 0.75
+  leafBrightness: 0.7
 --- !u!1001 &723362257
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3070,7 +3108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98f5e76bee13ff340b2c7e48f8781ffb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leafShape: {fileID: 634975694}
+  leafShape: {fileID: 0}
   treeFromSkeleton: {fileID: 0}
 --- !u!4 &961894963 stripped
 Transform:

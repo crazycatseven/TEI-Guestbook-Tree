@@ -90,8 +90,7 @@ public class TreeFromSkeleton : MonoBehaviour
         trunkVertices = TrunkParser.ParseTrunkVertices(trunkFilePath);
         branches = BranchParser.ParseBranches(trunkFilePath, 1);
         subBranches = BranchParser.ParseBranches(trunkFilePath, 2);
-
-                
+    
         // 1.1 在树干顶点组最后添加一个顶点，作为预留的插值顶点
         TreeVertex emptyVertex = new TreeVertex(-1, Vector3.zero, Vector3.zero, 0, 0);
         trunkVertices.Add(emptyVertex);
@@ -130,11 +129,18 @@ public class TreeFromSkeleton : MonoBehaviour
             branch.LengthRatios = new float[branch.Vertices.Count];
             branch.StartGlobalGrowthFactors = new float[branch.Vertices.Count];
 
-            // 把起始点设置为分叉点
-            branch.Vertices[0].IsFork = true;
-
             // 寻找起始顶点的index
             int startVertexIndex = branch.Vertices[0].Index;
+
+            if (trunkVertices.Find(vertex => vertex.Index == startVertexIndex) == null)
+            {
+                // Reverse branch vertices
+                branch.Vertices.Reverse();
+                startVertexIndex = branch.Vertices[0].Index;
+            }
+
+            // 把起始点设置为分叉点
+            branch.Vertices[0].IsFork = true;
 
             // 在树干顶点组中找到起始顶点
             float startVertexLengthRatio = trunkVertices.Find(vertex => vertex.Index == startVertexIndex).LengthRatio;
@@ -220,6 +226,25 @@ public class TreeFromSkeleton : MonoBehaviour
                         }
                         break;
                     }
+
+                    if (subBranch.Vertices[subBranch.Vertices.Count - 1].Index == branch.Vertices[i].Index)
+                    {
+                        subBranch.Vertices.Reverse();
+                        subBranch.Vertices[0].IsFork = true;
+                        branch.Vertices[i].IsFork = true;
+
+
+                        branch.SubBranches.Add(subBranch);
+
+                        subBranch.StartGlobalGrowthFactors = new float[subBranch.Vertices.Count];
+                        for (int j = 0; j < subBranch.Vertices.Count; j++)
+                        {
+                            subBranch.StartGlobalGrowthFactors[j] = branch.StartGlobalGrowthFactors[i] 
+                                + subBranch.LengthRatios[j] * (1 - branch.StartGlobalGrowthFactors[i]);
+                        }
+                        break;
+                    }
+
                 }
             }
         }
@@ -252,26 +277,6 @@ public class TreeFromSkeleton : MonoBehaviour
 
         // 5. 获得所有树叶
         leaves = LeafUtils.GetLeaves(branches);
-
-
-        // MeshGenerator.CreateLeavesMesh(transform, leaves, growthFactor * 0.1f, leavesNumber);
-
-        // // 创建叶子的网格
-        // // Mesh leavesMesh = MeshGenerator.CreateLeavesMesh(leaves, growthFactor * 0.1f, leavesNumber, leafPrefab);
-
-        // // 创建一个新的子游戏对象
-        // GameObject leavesObject = new GameObject("LeafObject");
-
-        // // 把新的子游戏对象设置为当前游戏对象的子对象
-        // leavesObject.transform.parent = this.transform;
-
-        // // 把叶子的网格赋给新的子游戏对象的 MeshFilter 组件
-        // MeshFilter leavesMeshFilter = leavesObject.AddComponent<MeshFilter>();
-        // leavesMeshFilter.mesh = leavesMesh;
-
-        // // 为叶子添加 MeshRenderer
-        // MeshRenderer leavesMeshRenderer = leavesObject.AddComponent<MeshRenderer>();
-
 
         treeUpdated = true;
 
@@ -314,22 +319,6 @@ public class TreeFromSkeleton : MonoBehaviour
             // Create leaves mesh
             // MeshGenerator.CreateLeavesMesh(leaves, growthFactor, leavesNumber, leafPrefab);
             MeshGenerator.CreateLeavesMesh(transform, leaves, growthFactor, leavesNumber);
-
-            // Find the leaf object
-            // Transform leafTransform = transform.Find("LeafObject");
-            // if (leafTransform == null)
-            // {
-            //     // The leaf object does not exist, create it
-            //     GameObject leafObject = new GameObject("LeafObject");
-            //     leafObject.transform.parent = transform;
-            //     leafObject.AddComponent<MeshFilter>();
-            //     leafObject.AddComponent<MeshRenderer>();
-            //     leafTransform = leafObject.transform;
-            // }
-
-            // Update the mesh of the leaf object
-            // MeshFilter leafMeshFilter = leafTransform.GetComponent<MeshFilter>();
-            // leafMeshFilter.mesh = leavesMesh;
 
             treeUpdated = false;
         }

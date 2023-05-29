@@ -107,6 +107,9 @@ public static class LeafDataUtils
         Vector2[] uv = new Vector2[resolution * 16];
         int[] triangles = new int[resolution * 24];
 
+        // 计算叶子中心位置
+        Vector2 centerPoint = BezierCurve(0.5f, controlPoints, leafHeight);
+
         for (int i = 0; i < resolution; i++)
         {
             float t = i / (float)resolution;
@@ -114,7 +117,13 @@ public static class LeafDataUtils
             float next_t = (i + 1) / (float)resolution;
             Vector2 next_point = BezierCurve(next_t, controlPoints, leafHeight);
 
-            float realLeafThickness = leafThickness /10;
+            // 计算当前顶点与叶子中心的距离
+            float distanceFromCenter = Vector2.Distance(point, centerPoint);
+
+            // 根据距离调整叶子厚度
+
+            float realLeafThickness = leafThickness * leafHeight * Mathf.Lerp(0.1f, 1f, (1 - Mathf.Abs(point.x) / leafHeight )) / 10;
+
 
             // Front face vertices
             vertices[i * 16] = new Vector3(point.y, point.x, -realLeafThickness / 2);
@@ -140,27 +149,31 @@ public static class LeafDataUtils
             vertices[i * 16 + 14] = new Vector3(-point.y, point.x, realLeafThickness / 2);
             vertices[i * 16 + 15] = new Vector3(-next_point.y, next_point.x, realLeafThickness / 2);
 
+            // Front face UV
+            uv[i * 16] = new Vector2(0, t);                  // Bottom left
+            uv[i * 16 + 1] = new Vector2(1, t);              // Bottom right
+            uv[i * 16 + 2] = new Vector2(0, t + 1.0f / (resolution - 1));  // Top left
+            uv[i * 16 + 3] = new Vector2(1, t + 1.0f / (resolution - 1));  // Top right
 
-            // // UV coordinates
-            // uv[i * 16] = new Vector2(0, 0);                  // Front face bottom left
-            // uv[i * 16 + 1] = new Vector2(1, 0);              // Front face bottom right
-            // uv[i * 16 + 2] = new Vector2(0, 1);              // Front face top left
-            // uv[i * 16 + 3] = new Vector2(1, 1);              // Front face top right
+            // Back face UV
+            uv[i * 16 + 4] = new Vector2(0, t);              // Bottom left
+            uv[i * 16 + 5] = new Vector2(1, t);              // Bottom right
+            uv[i * 16 + 6] = new Vector2(0, t + 1.0f / (resolution - 1));  // Top left
+            uv[i * 16 + 7] = new Vector2(1, t + 1.0f / (resolution - 1));  // Top right
 
-            // uv[i * 16 + 4] = new Vector2(0, 0);              // Back face bottom left
-            // uv[i * 16 + 5] = new Vector2(1, 0);              // Back face bottom right
-            // uv[i * 16 + 6] = new Vector2(0, 1);              // Back face top left
-            // uv[i * 16 + 7] = new Vector2(1, 1);              // Back face top right
 
-            // uv[i * 16 + 8] = new Vector2(0.5f, 0);           // Upper edge bottom
-            // uv[i * 16 + 9] = new Vector2(0.5f, 1);           // Upper edge top
-            // uv[i * 16 + 10] = new Vector2(0.5f, 0);          // Upper edge bottom (same as bottom left)
-            // uv[i * 16 + 11] = new Vector2(0.5f, 1);          // Upper edge top (same as top left)
+            // Upper edge UV
+            uv[i * 16 + 8] = new Vector2(0.5f, t);           // Bottom
+            uv[i * 16 + 9] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top
+            uv[i * 16 + 10] = new Vector2(0.5f, t);          // Bottom (same as bottom left)
+            uv[i * 16 + 11] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top (same as top left)
 
-            // uv[i * 16 + 12] = new Vector2(0.5f, 0);          // Lower edge bottom
-            // uv[i * 16 + 13] = new Vector2(0.5f, 1);          // Lower edge top
-            // uv[i * 16 + 14] = new Vector2(0.5f, 0);          // Lower edge bottom (same as bottom left)
-            // uv[i * 16 + 15] = new Vector2(0.5f, 1);          // Lower edge top (same as top left)
+            // Lower edge UV
+            uv[i * 16 + 12] = new Vector2(0.5f, t);          // Bottom
+            uv[i * 16 + 13] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top
+            uv[i * 16 + 14] = new Vector2(0.5f, t);          // Bottom (same as bottom left)
+            uv[i * 16 + 15] = new Vector2(0.5f, t + 1.0f / (resolution - 1));  // Top (same as top left)
+
 
             // Front face triangles
             triangles[i * 24] = i * 16 + 1;

@@ -1,0 +1,58 @@
+Label: Branch1
+  Vertex Group 2:
+    Vertex: 2, Position: <Vector (0.0939, -0.0363, 1.5567)>, Normal: <Vector (0.0602, -0.0232, 0.9979)>, RadiusX: 0.10749974846839905, RadiusY: 0.10749974846839905
+    Vertex: 6, Position: <Vector (-0.8293, -0.3735, 2.0037)>, Normal: <Vector (-0.3769, -0.1698, 0.9106)>, RadiusX: 0.09733816236257553, RadiusY: 0.09733816236257553
+    Vertex: 7, Position: <Vector (-1.3626, -0.2247, 3.4511)>, Normal: <Vector (-0.3666, -0.0605, 0.9284)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 20, Position: <Vector (-0.3623, -0.2906, 1.6806)>, Normal: <Vector (-0.2078, -0.1667, 0.9639)>, RadiusX: 0.09782273322343826, RadiusY: 0.09782273322343826
+    Vertex: 22, Position: <Vector (-1.0253, -0.2850, 2.5550)>, Normal: <Vector (-0.3704, -0.1030, 0.9231)>, RadiusX: 0.08432639390230179, RadiusY: 0.08432639390230179
+  Connected Vertices Sequence: 2 - 20 - 6 - 22 - 7
+  Vertex Group 3:
+    Vertex: 2, Position: <Vector (0.0939, -0.0363, 1.5567)>, Normal: <Vector (0.0602, -0.0232, 0.9979)>, RadiusX: 0.10749974846839905, RadiusY: 0.10749974846839905
+    Vertex: 11, Position: <Vector (-0.1578, 1.2876, 2.2621)>, Normal: <Vector (-0.0605, 0.4938, 0.8675)>, RadiusX: 0.0758933499455452, RadiusY: 0.0758933499455452
+    Vertex: 12, Position: <Vector (-0.1804, 1.6447, 3.0269)>, Normal: <Vector (-0.0523, 0.4768, 0.8775)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 16, Position: <Vector (-0.0287, 0.6411, 1.9094)>, Normal: <Vector (-0.0142, 0.3183, 0.9479)>, RadiusX: 0.08380841463804245, RadiusY: 0.08380841463804245
+  Connected Vertices Sequence: 2 - 16 - 11 - 12
+  Vertex Group 4:
+    Vertex: 18, Position: <Vector (0.5806, -0.6048, 2.1846)>, Normal: <Vector (0.2481, -0.2585, 0.9336)>, RadiusX: 0.0877557098865509, RadiusY: 0.0877557098865509
+    Vertex: 19, Position: <Vector (0.0002, -0.9869, 3.0688)>, Normal: <Vector (0.0001, -0.3062, 0.9520)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+  Connected Vertices Sequence: 18 - 19
+  Vertex Group 5:
+    Vertex: 3, Position: <Vector (1.0426, 0.0801, 2.0424)>, Normal: <Vector (0.4544, 0.0349, 0.8901)>, RadiusX: 0.08334914594888687, RadiusY: 0.08334914594888687
+    Vertex: 4, Position: <Vector (1.6909, 0.3738, 3.1054)>, Normal: <Vector (0.4755, 0.1051, 0.8734)>, RadiusX: 0.08802089095115662, RadiusY: 0.08802089095115662
+    Vertex: 5, Position: <Vector (1.8592, 0.6353, 4.1363)>, Normal: <Vector (0.4060, 0.1387, 0.9033)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 8, Position: <Vector (0.4400, -0.1993, 1.7593)>, Normal: <Vector (0.2412, -0.1093, 0.9643)>, RadiusX: 0.10290025919675827, RadiusY: 0.10290025919675827
+    Vertex: 13, Position: <Vector (1.3667, 0.2270, 2.5739)>, Normal: <Vector (0.4676, 0.0776, 0.8805)>, RadiusX: 0.08016390353441238, RadiusY: 0.08016390353441238
+  Connected Vertices Sequence: 5 - 4 - 13 - 3 - 8
+Label: Branch2
+  Vertex Group 6:
+    Vertex: 13, Position: <Vector (1.3667, 0.2270, 2.5739)>, Normal: <Vector (0.4676, 0.0776, 0.8805)>, RadiusX: 0.08016390353441238, RadiusY: 0.08016390353441238
+    Vertex: 14, Position: <Vector (1.3570, -0.4991, 3.7044)>, Normal: <Vector (0.3412, -0.1255, 0.9316)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+  Connected Vertices Sequence: 13 - 14
+  Vertex Group 7:
+    Vertex: 3, Position: <Vector (1.0426, 0.0801, 2.0424)>, Normal: <Vector (0.4544, 0.0349, 0.8901)>, RadiusX: 0.08334914594888687, RadiusY: 0.08334914594888687
+    Vertex: 15, Position: <Vector (1.3037, 1.3080, 3.0328)>, Normal: <Vector (0.3672, 0.3684, 0.8541)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 24, Position: <Vector (1.2480, 0.7434, 2.3297)>, Normal: <Vector (0.4546, 0.2708, 0.8486)>, RadiusX: 0.05689908191561699, RadiusY: 0.05689908191561699
+  Connected Vertices Sequence: 3 - 24 - 15
+  Vertex Group 8:
+    Vertex: 16, Position: <Vector (-0.0287, 0.6411, 1.9094)>, Normal: <Vector (-0.0142, 0.3183, 0.9479)>, RadiusX: 0.08380841463804245, RadiusY: 0.08380841463804245
+    Vertex: 17, Position: <Vector (0.6777, 0.8060, 2.5260)>, Normal: <Vector (0.2476, 0.2945, 0.9230)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+  Connected Vertices Sequence: 16 - 17
+  Vertex Group 9:
+    Vertex: 20, Position: <Vector (-0.3623, -0.2906, 1.6806)>, Normal: <Vector (-0.2078, -0.1667, 0.9639)>, RadiusX: 0.09782273322343826, RadiusY: 0.09782273322343826
+    Vertex: 21, Position: <Vector (-0.1543, -1.2924, 2.2672)>, Normal: <Vector (-0.0590, -0.4944, 0.8672)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+  Connected Vertices Sequence: 20 - 21
+  Vertex Group 10:
+    Vertex: 22, Position: <Vector (-1.0253, -0.2850, 2.5550)>, Normal: <Vector (-0.3704, -0.1030, 0.9231)>, RadiusX: 0.08432639390230179, RadiusY: 0.08432639390230179
+    Vertex: 23, Position: <Vector (-1.1613, 0.7729, 3.0189)>, Normal: <Vector (-0.3492, 0.2324, 0.9078)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 25, Position: <Vector (-1.0783, 0.2762, 2.6029)>, Normal: <Vector (-0.3809, 0.0976, 0.9195)>, RadiusX: 0.060678303241729736, RadiusY: 0.060678303241729736
+  Connected Vertices Sequence: 22 - 25 - 23
+Label: Trunk
+  Vertex Group 1:
+    Vertex: 0, Position: <Vector (0.0000, 0.0000, 0.0000)>, Normal: <Vector (0.0000, 0.0000, 0.0000)>, RadiusX: 0.13200000166893005, RadiusY: 0.14200000166893005
+    Vertex: 1, Position: <Vector (-0.0275, 0.0077, 0.8994)>, Normal: <Vector (-0.0306, 0.0085, 0.9995)>, RadiusX: 0.12279486775398254, RadiusY: 0.12279486775398254
+    Vertex: 2, Position: <Vector (0.0939, -0.0363, 1.5567)>, Normal: <Vector (0.0602, -0.0232, 0.9979)>, RadiusX: 0.10749974846839905, RadiusY: 0.10749974846839905
+    Vertex: 8, Position: <Vector (0.4400, -0.1993, 1.7593)>, Normal: <Vector (0.2412, -0.1093, 0.9643)>, RadiusX: 0.10290025919675827, RadiusY: 0.10290025919675827
+    Vertex: 9, Position: <Vector (0.7212, -1.0103, 2.6099)>, Normal: <Vector (0.2495, -0.3496, 0.9031)>, RadiusX: 0.07669899612665176, RadiusY: 0.07669899612665176
+    Vertex: 10, Position: <Vector (0.7781, -1.7465, 3.7150)>, Normal: <Vector (0.1862, -0.4180, 0.8891)>, RadiusX: 0.02541414089500904, RadiusY: 0.02541414089500904
+    Vertex: 18, Position: <Vector (0.5806, -0.6048, 2.1846)>, Normal: <Vector (0.2481, -0.2585, 0.9336)>, RadiusX: 0.0877557098865509, RadiusY: 0.0877557098865509
+  Connected Vertices Sequence: 0 - 1 - 2 - 8 - 18 - 9 - 10
