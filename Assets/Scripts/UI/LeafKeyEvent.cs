@@ -25,7 +25,6 @@ public class LeafKeyEvent : MonoBehaviour
         // 查找TreeFromSkeleton脚本所在的GameObject
         treeFromSkeleton = FindObjectOfType<TreeFromSkeleton>();
 
-
         // 初始化所有方向为“增加”
         for (int i = 0; i < directions.Length; i++)
         {
@@ -47,11 +46,32 @@ public class LeafKeyEvent : MonoBehaviour
         // 根据键盘输入更新每个属性
         for (int i = 0; i < 9; i++)
         {
-            KeyCode key = KeyCode.Keypad1 + i; // 对应小键盘的数字键
+
+
+            KeyCode key = KeyCode.None;
+            if (i >= 0 && i <= 8)
+            {
+                // 使用大键盘上的数字键
+                key = KeyCode.Alpha1 + i;
+            }
+            else if (i == 9)
+            {
+                // 使用小键盘上的数字键0
+                key = KeyCode.Keypad0;
+            }
+
             if (Input.GetKey(key))
             {
                 IncrementValue(i);
             }
+            // KeyCode key = KeyCode.Keypad1 + i; // 对应小键盘的数字键
+            // if (Input.GetKey(key))
+            // {
+            //     IncrementValue(i);
+            // }
+
+
+            
         }
     }
 

@@ -8,7 +8,7 @@ public class RotateObject : MonoBehaviour
     private void Update()
     {
         // 按下小键盘上的0键，切换旋转开关
-        if (Input.GetKeyDown(KeyCode.Keypad0))
+        if (Input.GetKeyDown(KeyCode.Keypad0) || Input.GetKeyDown(KeyCode.Alpha0))
         {
             rotationEnabled = !rotationEnabled;
         }
